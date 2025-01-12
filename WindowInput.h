@@ -4,6 +4,11 @@
 #include <string>
 #include <include/core/SkSurface.h>
 #include <include/core/SkCanvas.h>
+#include <include/core/SkFontMgr.h>
+#include <include/core/SkFontStyle.h>
+#include <include/ports/SkTypeface_win.h>
+#include <include/core/SkFont.h>
+#include <include/core/SkFontMetrics.h>
 
 class WindowInput
 {
@@ -12,10 +17,12 @@ public:
 	~WindowInput();
 	void show();
 private:
+	void initSize();
+	void initWindow();
+	void initSurface();
 	void initFont();
 	void paint();
-	void initWindow();
-	void initImg();
+	void paintText();
 	void flashCaret();
 	bool enableAlpha();
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -23,9 +30,12 @@ private:
 private:
 	int x, y, w, h;
 	HWND hwnd;
-	//std::unique_ptr<BLImage> img;
-	//float fontSize{ 26 };
-	//std::unique_ptr<BLFont> font;
-	//bool caretVisible{ true };
-	//BLPoint caretPos{ 10,10 };
+	sk_sp<SkSurface> surface;
+	std::wstring text{ L"ÄãºÃ£¬World£¡" };
+	SkFont font;
+	float fontTop, fontBottom;
+	std::vector<SkPoint> wordPos;
+	bool caretVisible{ true };
+	int caretIndex{ 6 };
+	float fontSize{ 26 };
 };

@@ -32,6 +32,7 @@ if(WIN32)
 		kernel32 
 		user32 
 		shell32
+		usp10
 	)
 elseif(APPLE)
 endif()

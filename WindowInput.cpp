@@ -6,8 +6,9 @@
 WindowInput::WindowInput()
 {
     initFont();
+    initSize();
+    initSurface();
     initWindow();
-    //initImg();
 }
 
 WindowInput::~WindowInput()
@@ -16,44 +17,89 @@ WindowInput::~WindowInput()
 
 void WindowInput::show()
 {
-    //SetTimer(hwnd, 1001, 200, NULL);
+    SetTimer(hwnd, 1001, 600, NULL);
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
 }
 
 void WindowInput::initFont()
 {
+    auto fontMgr = SkFontMgr_New_GDI();
+    auto fontStyle = SkFontStyle::Normal();
+    auto typeFace = fontMgr->matchFamilyStyle("Microsoft YaHei", fontStyle);
+    font = SkFont(typeFace, fontSize);
+    font.setEdging(SkFont::Edging::kSubpixelAntiAlias);
+    font.setSubpixel(true);
+    SkFontMetrics metrics;
+    font.getMetrics(&metrics);
+    fontTop = metrics.fTop;
+    fontBottom = metrics.fBottom;
 }
+
+void WindowInput::paintText()
+{
+    SkPaint paint;
+    paint.setColor(0xFF00FFFF);
+    paint.setStroke(false);
+
+    auto length = text.size() * sizeof(wchar_t);
+    std::vector<SkGlyphID> glyphs(text.size());
+    int glyphCount = font.textToGlyphs(text.data(), length, SkTextEncoding::kUTF16, glyphs.data(), text.size());
+    std::vector<SkScalar> widths(glyphCount);
+    font.getWidthsBounds(glyphs.data(), glyphCount, widths.data(), nullptr, nullptr);
+    wordPos.resize(glyphCount);
+    
+    SkScalar x = 12;
+    for (int i = 0; i < glyphCount; ++i) {
+        wordPos[i] = SkPoint::Make(x, fontBottom - fontTop);
+        x += widths[i]; // 累计宽度
+    }
+    SkCanvas* canvas = surface->getCanvas();
+    canvas->clear(0xFF345678);
+    canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos.data(), SkPoint(0, 0), font, paint);
+}
+
+void WindowInput::flashCaret()
+{
+    auto color = caretVisible ? 0xFF00FFFF : 0xFF345678;
+    auto x = wordPos[caretIndex].fX,y = wordPos[caretIndex].fY;
+    SkPoint start = SkPoint(x, y + fontTop);// 字符顶部相对于基线的偏移  neagtive
+    SkPoint end = SkPoint(x, y + fontBottom); // 字符底部相对于基线的偏移
+    SkCanvas* canvas = surface->getCanvas();
+    SkPaint paint;
+    paint.setColor(color);
+    paint.setStroke(true);
+    paint.setStrokeWidth(1);
+    canvas->drawLine(start, end, paint);
+    caretVisible = !caretVisible;
+    InvalidateRect(hwnd, nullptr, true);
+}
+
 
 void WindowInput::paint()
 {
     if (w <= 0 || h <= 0) return;
-    SkColor* surfaceMemory = new SkColor[w * h];
-    SkImageInfo info = SkImageInfo::MakeN32Premul(w, h);
-    std::unique_ptr<SkCanvas> canvas = SkCanvas::MakeRasterDirect(info, surfaceMemory, 4 * w);
-    canvas->clear(SK_ColorBLACK);
-    SkPaint paint;
-    paint.setColor(SK_ColorRED);
-    SkRect rect = SkRect::MakeXYWH(w - 150, h - 150, 140, 140);
-    canvas->drawRect(rect, paint);
-
+    SkPixmap pix;
+    surface->peekPixels(&pix);
     PAINTSTRUCT ps;
     auto dc = BeginPaint(hwnd, &ps);
     BITMAPINFO bmi = { sizeof(BITMAPINFOHEADER), w, 0 - h, 1, 32, BI_RGB, h * 4 * w, 0, 0, 0, 0 };
-    SetDIBitsToDevice(dc, 0, 0, w, h, 0, 0, 0, h, surfaceMemory, &bmi, DIB_RGB_COLORS);
+    SetDIBitsToDevice(dc, 0, 0, w, h, 0, 0, 0, h, pix.addr(), &bmi, DIB_RGB_COLORS);
     ReleaseDC(hwnd, dc);
     EndPaint(hwnd, &ps);
-    delete[] surfaceMemory;
 }
 
-void WindowInput::initWindow()
+void WindowInput::initSize()
 {
     w = 800; h = 600;
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
     x = (screenWidth - w) / 2;
     y = (screenHeight - h) / 2;
+}
 
+void WindowInput::initWindow()
+{
     WNDCLASSEX wcx{};
     auto hinstance = GetModuleHandle(NULL);
     wcx.cbSize = sizeof(wcx);
@@ -67,6 +113,14 @@ void WindowInput::initWindow()
     hwnd = CreateWindowEx(NULL, wcx.lpszClassName, wcx.lpszClassName, WS_POPUP, x, y, w, h, NULL, NULL, hinstance, static_cast<LPVOID>(this));
     enableAlpha();
     SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+}
+
+void WindowInput::initSurface()
+{
+    SkImageInfo info = SkImageInfo::MakeN32Premul(w, h);
+    surface = SkSurfaces::Raster(info);
+
+    paintText();
 }
 
 bool WindowInput::enableAlpha()
@@ -140,9 +194,16 @@ LRESULT WindowInput::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         paint();
         return 0;
     }
+    else if (msg == WM_TIMER) {
+        if (wParam == 1001)
+        {
+            flashCaret();
+        }
+    }
     else if (msg == WM_SIZE) {
         w = LOWORD(lParam);
         h = HIWORD(lParam);
+        initSurface();
         return 0;
     }
     else if (msg == WM_MOVE) {
