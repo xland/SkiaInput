@@ -1,4 +1,4 @@
-#include <windowsx.h>
+Ôªø#include <windowsx.h>
 #include <dwmapi.h>
 #include <versionhelpers.h>
 #include "WindowInput.h"
@@ -47,24 +47,27 @@ void WindowInput::paintText()
     int glyphCount = font.textToGlyphs(text.data(), length, SkTextEncoding::kUTF16, glyphs.data(), text.size());
     std::vector<SkScalar> widths(glyphCount);
     font.getWidthsBounds(glyphs.data(), glyphCount, widths.data(), nullptr, nullptr);
-    wordPos.resize(glyphCount);
+    wordPos.resize(glyphCount+1);
     
     SkScalar x = 12;
     for (int i = 0; i < glyphCount; ++i) {
         wordPos[i] = SkPoint::Make(x, fontBottom - fontTop);
-        x += widths[i]; // ¿€º∆øÌ∂»
+        x += widths[i]; // Á¥ØËÆ°ÂÆΩÂ∫¶
     }
+    wordPos[glyphCount] = SkPoint::Make(x, fontBottom - fontTop);
     SkCanvas* canvas = surface->getCanvas();
     canvas->clear(0xFF345678);
     canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos.data(), SkPoint(0, 0), font, paint);
+    caretVisible = true;
+    flashCaret();
 }
 
 void WindowInput::flashCaret()
 {
     auto color = caretVisible ? 0xFF00FFFF : 0xFF345678;
     auto x = wordPos[caretIndex].fX,y = wordPos[caretIndex].fY;
-    SkPoint start = SkPoint(x, y + fontTop);// ◊÷∑˚∂•≤øœ‡∂‘”⁄ª˘œﬂµƒ∆´“∆  neagtive
-    SkPoint end = SkPoint(x, y + fontBottom); // ◊÷∑˚µ◊≤øœ‡∂‘”⁄ª˘œﬂµƒ∆´“∆
+    SkPoint start = SkPoint(x, y + fontTop);// Â≠óÁ¨¶È°∂ÈÉ®Áõ∏ÂØπ‰∫éÂü∫Á∫øÁöÑÂÅèÁßª  neagtive
+    SkPoint end = SkPoint(x, y + fontBottom); // Â≠óÁ¨¶Â∫ïÈÉ®Áõ∏ÂØπ‰∫éÂü∫Á∫øÁöÑÂÅèÁßª
     SkCanvas* canvas = surface->getCanvas();
     SkPaint paint;
     paint.setColor(color);
@@ -72,7 +75,6 @@ void WindowInput::flashCaret()
     paint.setStrokeWidth(1);
     canvas->drawLine(start, end, paint);
     caretVisible = !caretVisible;
-    InvalidateRect(hwnd, nullptr, true);
 }
 
 
@@ -119,7 +121,6 @@ void WindowInput::initSurface()
 {
     SkImageInfo info = SkImageInfo::MakeN32Premul(w, h);
     surface = SkSurfaces::Raster(info);
-
     paintText();
 }
 
@@ -127,12 +128,12 @@ bool WindowInput::enableAlpha()
 {
     if (!IsWindowsVistaOrGreater()) { return false; }
     BOOL isCompositionEnable = false;
-    //ºÏ≤ÈDWM «∑Ò∆Ù”√
+    //Ê£ÄÊü•DWMÊòØÂê¶ÂêØÁî®
     DwmIsCompositionEnabled(&isCompositionEnable);
     if (!isCompositionEnable) { return true; }
     DWORD currentColor = 0;
     BOOL isOpaque = false;
-    //ºÏ≤È «∑Ò÷ß≥÷√´≤£¡ß–ßπ˚
+    //Ê£ÄÊü•ÊòØÂê¶ÊîØÊåÅÊØõÁéªÁíÉÊïàÊûú
     DwmGetColorizationColor(&currentColor, &isOpaque);
     if (!isOpaque || IsWindows8OrGreater())
     {
@@ -154,19 +155,71 @@ bool WindowInput::enableAlpha()
     }
 }
 
+void WindowInput::onMouseDown(const int& x, const int& y)
+{
+}
+
+void WindowInput::onDoubleClick(const int& x, const int& y)
+{
+}
+
+void WindowInput::onMouseUp(const int& x, const int& y)
+{
+}
+
+void WindowInput::onMouseDrag(const int& x, const int& y)
+{
+}
+
+void WindowInput::onMouseMove(const int& x, const int& y)
+{
+}
+
+void WindowInput::onMouseDownRight(const int& x, const int& y)
+{
+}
+
+void WindowInput::onKeyDown(const unsigned int& val)
+{
+    if (val == VK_UP) {
+    }
+    else if (val == VK_DOWN) {
+    }
+    else if (val == VK_LEFT) {
+        caretIndex -= 1;
+        if (caretIndex < 0) {
+            caretIndex = 0;
+        }
+        paintText();
+        InvalidateRect(hwnd, nullptr, false);
+    }
+    else if (val == VK_RIGHT) {
+        caretIndex += 1;
+        if (caretIndex >= wordPos.size()) {
+            caretIndex = wordPos.size()-1;
+        }
+        paintText();
+        InvalidateRect(hwnd, nullptr, false);
+    }
+}
+
+void WindowInput::onChar(const unsigned int& val)
+{
+}
+
 LRESULT WindowInput::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     auto obj = reinterpret_cast<WindowInput*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
     if (!obj) {
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
-    switch (msg)
+    switch(msg)
     {
         case WM_NCCALCSIZE:
         {
             if (wParam == TRUE) {
                 NCCALCSIZE_PARAMS* pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lParam);
-                pncsp->rgrc[0] = pncsp->rgrc[1]; //¥∞ø⁄øÕªß«¯∏≤∏«’˚∏ˆ¥∞ø⁄
+                pncsp->rgrc[0] = pncsp->rgrc[1]; //Á™óÂè£ÂÆ¢Êà∑Âå∫Ë¶ÜÁõñÊï¥‰∏™Á™óÂè£
                 return 0;
             }
             return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -198,6 +251,7 @@ LRESULT WindowInput::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         if (wParam == 1001)
         {
             flashCaret();
+            InvalidateRect(hwnd, nullptr, false);
         }
     }
     else if (msg == WM_SIZE) {
@@ -209,6 +263,41 @@ LRESULT WindowInput::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
     else if (msg == WM_MOVE) {
         x = LOWORD(lParam);
         y = HIWORD(lParam);
+        return 0;
+    }
+    else if (msg == WM_LBUTTONDOWN){
+        isMouseDown = true;
+        onMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        return 0;
+    }
+    else if (msg == WM_LBUTTONDBLCLK){
+        onDoubleClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        return 0;
+    }
+    else if (msg == WM_LBUTTONUP) {
+        isMouseDown = false;
+        onMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        return 0;
+    }
+    else if (msg == WM_MOUSEMOVE) {
+        if (isMouseDown) {
+            onMouseDrag(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        }
+        else {
+            onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        }
+        return 0;
+    }
+    else if (msg == WM_RBUTTONDOWN) {
+        onMouseDownRight(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        return 0;
+    }
+    else if (msg == WM_KEYDOWN) {
+        onKeyDown(wParam);
+        return 0;
+    }
+    else if (msg == WM_CHAR) {
+        onChar(wParam);
         return 0;
     }
     return DefWindowProc(hwnd, msg, wParam, lParam);
