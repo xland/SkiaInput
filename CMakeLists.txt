@@ -10,29 +10,22 @@ link_directories(
 )
 include_directories(
     "D:\\sdk\\skia"
-	"D:\\sdk\\skia\\third_party\\externals\\dawn\\include"
-	"D:\\sdk\\skia\\out\\debug\\gen\\third_party\\externals\\dawn\\include"
 )
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE 
 	"main.cpp" 
- "WindowInput.h" "WindowInput.cpp")
+	"WindowInput.h" 
+	"WindowInput.cpp")
 
-if(WIN32)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
-    set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DPI_AWARE "PerMonitor")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:UNICODE DEBUG NOMINMAX _SILENCE_ALL_CXX20_DEPRECATION_WARNINGS SK_DEBUG WIN32 _WINDOWS>)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:UNICODE NDEBUG NOMINMAX _SILENCE_ALL_CXX20_DEPRECATION_WARNINGS WIN32 _WINDOWS>)
-    TARGET_LINK_LIBRARIES(${PROJECT_NAME} 
-		skia 
-		dawn_proc_static 
-		dawn_platform_static 
-		dawn_native_static 
-		dwmapi
-		kernel32 
-		user32 
-		shell32
-		usp10
-	)
-elseif(APPLE)
-endif()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
+set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DPI_AWARE "PerMonitor")
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:UNICODE DEBUG NOMINMAX _SILENCE_ALL_CXX20_DEPRECATION_WARNINGS WIN32 _WINDOWS>)
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:UNICODE NDEBUG NOMINMAX _SILENCE_ALL_CXX20_DEPRECATION_WARNINGS WIN32 _WINDOWS>)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} 
+	skia 
+	dwmapi
+	kernel32 
+	user32 
+	shell32
+	usp10
+)
