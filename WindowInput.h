@@ -25,6 +25,7 @@ private:
 	void paintText();
 	void flashCaret();
 	bool enableAlpha();
+	void activeKeyboard();
 	void onMouseDown(const int& x, const int& y);
 	void onDoubleClick(const int& x, const int& y);
 	void onMouseUp(const int& x, const int& y);
@@ -39,12 +40,12 @@ private:
 	int x, y, w, h;
 	HWND hwnd;
 	sk_sp<SkSurface> surface;
-	std::wstring text{ L"你好，World" };
+	std::wstring text{ L"你好，World!" };
 	SkFont font;
 	float fontTop, fontBottom;
 	std::vector<SkPoint> wordPos;
 	bool caretVisible{ true };
-	int caretIndex{ 6 };
+	int caretIndex{ -1 };
 	float fontSize{ 26 };
 	bool isMouseDown{ false };
 };

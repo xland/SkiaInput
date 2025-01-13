@@ -28,4 +28,5 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 	user32 
 	shell32
 	usp10
+	imm32
 )

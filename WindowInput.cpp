@@ -20,6 +20,7 @@ void WindowInput::show()
     SetTimer(hwnd, 1001, 600, NULL);
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
+    activeKeyboard();
 }
 
 void WindowInput::initFont()
@@ -55,6 +56,7 @@ void WindowInput::paintText()
         x += widths[i]; // 累计宽度
     }
     wordPos[glyphCount] = SkPoint::Make(x, fontBottom - fontTop);
+    if (caretIndex < 0) caretIndex = wordPos.size() - 1;
     SkCanvas* canvas = surface->getCanvas();
     canvas->clear(0xFF345678);
     canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos.data(), SkPoint(0, 0), font, paint);
@@ -121,7 +123,7 @@ void WindowInput::initSurface()
 {
     SkImageInfo info = SkImageInfo::MakeN32Premul(w, h);
     surface = SkSurfaces::Raster(info);
-    paintText();
+    paintText();    
 }
 
 bool WindowInput::enableAlpha()
@@ -205,6 +207,70 @@ void WindowInput::onKeyDown(const unsigned int& val)
 
 void WindowInput::onChar(const unsigned int& val)
 {
+    if (val == 13) { //enter
+        //if (wordIndex != lines[lineIndex].length()) {
+        //    auto str1 = lines[lineIndex].substr(0, wordIndex);
+        //    auto str2 = lines[lineIndex].substr(wordIndex);
+        //    lines[lineIndex] = str1;
+        //    lines.insert(lines.begin() + lineIndex + 1, str2);
+        //}
+        //else
+        //{
+        //    lines.push_back(L"");
+        //}
+        //lineIndex += 1;
+        //wordIndex = 0;
+    }
+    else if (val == 8) { //backspace 删除一个字
+        /*if (lines.size() == 0) {
+            return false;
+        }
+        if (wordIndex == 0) {
+            if (lineIndex == 0) {
+                return false;
+            }
+            else {
+                wordIndex = lines[lineIndex - 1].size();
+                lines[lineIndex - 1] = lines[lineIndex - 1] + lines[lineIndex];
+                lines.erase(lines.begin() + lineIndex);
+                lineIndex -= 1;
+                showCursor = true;
+                Paint(nullptr);
+                return false;
+            }
+        }
+        lines[lineIndex] = lines[lineIndex].substr(0, wordIndex - 1) + lines[lineIndex].substr(wordIndex);
+        if (lines[lineIndex].empty()) {
+            lines.erase(lines.begin() + lineIndex);
+            lineIndex -= 1;
+            if (lineIndex < 0) {
+                lineIndex = 0;
+                wordIndex = 0;
+            }
+            else {
+                wordIndex = lines[lineIndex].length();
+            }
+        }
+        else {
+            wordIndex -= 1;
+        }*/
+    }
+    else {
+        std::wstring word{ (wchar_t)val };
+        text = text+word;
+        //if (lines.size() == 0) {
+        //    text.push_back(word);
+        //}
+        //else {
+        //    auto str1 = lines[lineIndex].substr(0, wordIndex);
+        //    auto str2 = lines[lineIndex].substr(wordIndex);
+        //    lines[lineIndex] = str1 + word + str2;
+        //}
+        caretIndex += 1;
+        paintText();
+        InvalidateRect(hwnd, nullptr, false);
+        activeKeyboard();
+    }
 }
 
 LRESULT WindowInput::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -301,4 +367,23 @@ LRESULT WindowInput::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+void WindowInput::activeKeyboard()
+{
+    if (HIMC himc = ImmGetContext(hwnd))
+    {
+        auto x = wordPos[caretIndex].fX;
+        auto y = wordPos[caretIndex].fY;
+        COMPOSITIONFORM comp = {};
+        comp.ptCurrentPos.x = x;
+        comp.ptCurrentPos.y = y;
+        comp.dwStyle = CFS_FORCE_POSITION;
+        ImmSetCompositionWindow(himc, &comp);
+        CANDIDATEFORM cand = {};
+        cand.dwStyle = CFS_CANDIDATEPOS;
+        cand.ptCurrentPos.x = x;
+        cand.ptCurrentPos.y = y;
+        ImmSetCandidateWindow(himc, &cand);
+        ImmReleaseContext(hwnd, himc);
+    }
 }
