@@ -5,6 +5,7 @@
 
 WindowInput::WindowInput()
 {
+    initText();
     initFont();
     initSize();
     initSurface();
@@ -37,10 +38,9 @@ void WindowInput::initFont()
     fontBottom = metrics.fBottom;
 }
 
-void WindowInput::paintOneLine(const std::wstring& text, const int& lineIndex,SkCanvas* canvas)
+void WindowInput::paintLine(const std::wstring& text, const int& lineIndex,SkCanvas* canvas)
 {
     wordPos.insert({ lineIndex,std::vector<SkPoint>() });
-    if (text.empty()) return;
     SkPaint paint;
     paint.setColor(0xFF00FFFF);
     paint.setStroke(false);
@@ -61,33 +61,71 @@ void WindowInput::paintOneLine(const std::wstring& text, const int& lineIndex,Sk
     canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos[lineIndex].data(), SkPoint(0, lineIndex * height), font, paint);
 }
 
+void WindowInput::onEnter()
+{
+    if (caretWordIndex != lines[caretWordIndex].length()) {
+        auto str1 = lines[caretLineIndex].substr(0, caretWordIndex);
+        auto str2 = lines[caretLineIndex].substr(caretWordIndex);
+        lines[caretLineIndex] = str1;
+        lines.insert(lines.begin() + caretLineIndex + 1, str2);
+    }
+    else
+    {
+        lines.push_back(L"");
+    }
+    caretLineIndex += 1;
+    caretWordIndex = 0;
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+}
+
+void WindowInput::onBackspace()
+{
+    if (lines.size() == 0) {
+        return;
+    }
+    if (caretWordIndex == 0) {
+        if (caretLineIndex == 0) {
+            return;
+        }
+        else {
+            caretWordIndex = lines[caretLineIndex - 1].size();
+            lines[caretLineIndex - 1] = lines[caretLineIndex - 1] + lines[caretLineIndex];
+            lines.erase(lines.begin() + caretLineIndex);
+            caretLineIndex -= 1;
+            paintText();
+            InvalidateRect(hwnd, nullptr, false);
+            return;
+        }
+    }
+    lines[caretLineIndex] = lines[caretLineIndex].substr(0, caretWordIndex - 1) + lines[caretLineIndex].substr(caretWordIndex);
+    if (lines[caretLineIndex].empty()) {
+        lines.erase(lines.begin() + caretLineIndex);
+        caretLineIndex -= 1;
+        if (caretLineIndex < 0) {
+            caretLineIndex = 0;
+            caretWordIndex = 0;
+        }
+        else {
+            caretWordIndex = lines[caretLineIndex].length();
+        }
+    }
+    else {
+        caretWordIndex -= 1;
+    }
+}
+
 
 void WindowInput::paintText()
 {
+    wordPos.clear();
     SkCanvas* canvas = surface->getCanvas();
     canvas->clear(0xFF345678);
     std::wstring currentLine;
     int lineIndex{ 0 };
-    for (size_t i = 0; i < text.size(); ++i) {
-        if (text[i] == L'\n' || (text[i] == L'\r' && (i + 1 < text.size() && text[i + 1] == L'\n'))) {
-            // 如果遇到 '\n' 或者 '\r\n'（Windows换行），调用特定方法
-            paintOneLine(currentLine, lineIndex,canvas);
-            lineIndex += 1;
-            // 清空当前行准备处理下一行
-            currentLine.clear();
-            // 如果是 "\r\n" 组合，跳过 '\r'
-            if (text[i] == L'\r' && i + 1 < text.size() && text[i + 1] == L'\n') {
-                ++i; // 跳过下一个 '\n'
-            }
-        }
-        else {
-            // 否则将当前字符添加到当前行
-            currentLine.push_back(text[i]);
-        }
-    }
-    // 处理最后一行（如果文本没有以换行符结束）
-    if (!currentLine.empty()) {
-        paintOneLine(currentLine, lineIndex, canvas);
+    for (size_t i = 0; i < lines.size(); i++)
+    {
+        paintLine(lines[i], i, canvas);
     }
     if (caretLineIndex < 0) {
         caretLineIndex = wordPos.size() - 1;
@@ -136,6 +174,40 @@ void WindowInput::initSize()
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
     x = (screenWidth - w) / 2;
     y = (screenHeight - h) / 2;
+}
+
+void WindowInput::initText()
+{
+    std::wstring text{ LR"(破阵子·为陈同甫赋壮词以寄之
+辛弃疾 · 宋 · XinQiJi(1140年－1207年) 
+
+醉里挑灯看剑，梦回吹角连营。
+八百里分麾下炙，五十弦翻塞外声，沙场秋点兵。
+马作的卢飞快，弓如霹雳弦惊。
+了却君王天下事，赢得生前身后名。可怜白发生！
+)" };
+
+    std::wstring currentLine;
+    for (size_t i = 0; i < text.size(); ++i) {
+        if (text[i] == L'\n' || (text[i] == L'\r' && (i + 1 < text.size() && text[i + 1] == L'\n'))) {
+            // 如果遇到 '\n' 或者 '\r\n'（Windows换行），调用特定方法
+            lines.push_back(currentLine);
+            // 清空当前行准备处理下一行
+            currentLine.clear();
+            // 如果是 "\r\n" 组合，跳过 '\r'
+            if (text[i] == L'\r' && i + 1 < text.size() && text[i + 1] == L'\n') {
+                ++i; // 跳过下一个 '\n'
+            }
+        }
+        else {
+            // 否则将当前字符添加到当前行
+            currentLine.push_back(text[i]);
+        }
+    }
+    // 处理最后一行（如果文本没有以换行符结束）
+    if (!currentLine.empty()) {
+        lines.push_back(currentLine);
+    }
 }
 
 void WindowInput::initWindow()
@@ -220,18 +292,32 @@ void WindowInput::onMouseDownRight(const int& x, const int& y)
 void WindowInput::onKeyDown(const unsigned int& val)
 {
     if (val == VK_UP) {
+        if (caretLineIndex <= 0) return;
+        caretLineIndex -= 1;
+        if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
+            caretWordIndex = wordPos[caretLineIndex].size() - 1;
+        }
+        paintText();
+        InvalidateRect(hwnd, nullptr, false);
     }
     else if (val == VK_DOWN) {
+        if (caretLineIndex >= wordPos.size()-1) return;
+        caretLineIndex += 1;
+        if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
+            caretWordIndex = wordPos[caretLineIndex].size() - 1;
+        }
+        paintText();
+        InvalidateRect(hwnd, nullptr, false);
     }
     else if (val == VK_LEFT) {
         caretWordIndex -= 1;
         if (caretWordIndex < 0) {
-            if (caretLineIndex <= wordPos.size()) {
+            if (caretLineIndex <= 0) {
                 caretWordIndex = 0;
                 return;
             }
             caretLineIndex -= 1;
-            caretWordIndex = 0;
+            caretWordIndex = wordPos[caretLineIndex].size()-1;
         }
         paintText();
         InvalidateRect(hwnd, nullptr, false);
@@ -239,7 +325,7 @@ void WindowInput::onKeyDown(const unsigned int& val)
     else if (val == VK_RIGHT) {
         caretWordIndex += 1;
         if (caretWordIndex >= wordPos[caretLineIndex].size()) {
-            if (caretLineIndex >= wordPos.size()) {
+            if (caretLineIndex >= wordPos.size()-1) {
                 caretWordIndex -= 1;
                 return;
             }
@@ -254,56 +340,14 @@ void WindowInput::onKeyDown(const unsigned int& val)
 void WindowInput::onChar(const unsigned int& val)
 {
     if (val == 13) { //enter
-        //if (wordIndex != lines[lineIndex].length()) {
-        //    auto str1 = lines[lineIndex].substr(0, wordIndex);
-        //    auto str2 = lines[lineIndex].substr(wordIndex);
-        //    lines[lineIndex] = str1;
-        //    lines.insert(lines.begin() + lineIndex + 1, str2);
-        //}
-        //else
-        //{
-        //    lines.push_back(L"");
-        //}
-        //lineIndex += 1;
-        //wordIndex = 0;
+        onEnter();
     }
     else if (val == 8) { //backspace 删除一个字
-        /*if (lines.size() == 0) {
-            return false;
-        }
-        if (wordIndex == 0) {
-            if (lineIndex == 0) {
-                return false;
-            }
-            else {
-                wordIndex = lines[lineIndex - 1].size();
-                lines[lineIndex - 1] = lines[lineIndex - 1] + lines[lineIndex];
-                lines.erase(lines.begin() + lineIndex);
-                lineIndex -= 1;
-                showCursor = true;
-                Paint(nullptr);
-                return false;
-            }
-        }
-        lines[lineIndex] = lines[lineIndex].substr(0, wordIndex - 1) + lines[lineIndex].substr(wordIndex);
-        if (lines[lineIndex].empty()) {
-            lines.erase(lines.begin() + lineIndex);
-            lineIndex -= 1;
-            if (lineIndex < 0) {
-                lineIndex = 0;
-                wordIndex = 0;
-            }
-            else {
-                wordIndex = lines[lineIndex].length();
-            }
-        }
-        else {
-            wordIndex -= 1;
-        }*/
+        onBackspace();
     }
     else {
         std::wstring word{ (wchar_t)val };
-        text = text+word;
+        //text = text+word;
         //if (lines.size() == 0) {
         //    text.push_back(word);
         //}
