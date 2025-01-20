@@ -37,8 +37,10 @@ void WindowInput::initFont()
     fontBottom = metrics.fBottom;
 }
 
-void WindowInput::paintText()
+void WindowInput::paintOneLine(const std::wstring& text, const int& lineIndex,SkCanvas* canvas)
 {
+    wordPos.insert({ lineIndex,std::vector<SkPoint>() });
+    if (text.empty()) return;
     SkPaint paint;
     paint.setColor(0xFF00FFFF);
     paint.setStroke(false);
@@ -48,18 +50,51 @@ void WindowInput::paintText()
     int glyphCount = font.textToGlyphs(text.data(), length, SkTextEncoding::kUTF16, glyphs.data(), text.size());
     std::vector<SkScalar> widths(glyphCount);
     font.getWidthsBounds(glyphs.data(), glyphCount, widths.data(), nullptr, nullptr);
-    wordPos.resize(glyphCount+1);
-    
+
     SkScalar x = 12;
+    float height{ fontBottom - fontTop };
     for (int i = 0; i < glyphCount; ++i) {
-        wordPos[i] = SkPoint::Make(x, fontBottom - fontTop);
+        wordPos[lineIndex].push_back(SkPoint::Make(x, height));
         x += widths[i]; // 累计宽度
     }
-    wordPos[glyphCount] = SkPoint::Make(x, fontBottom - fontTop);
-    if (caretIndex < 0) caretIndex = wordPos.size() - 1;
+    wordPos[lineIndex].push_back(SkPoint::Make(x, height));
+    canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos[lineIndex].data(), SkPoint(0, lineIndex * height), font, paint);
+}
+
+
+void WindowInput::paintText()
+{
     SkCanvas* canvas = surface->getCanvas();
     canvas->clear(0xFF345678);
-    canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos.data(), SkPoint(0, 0), font, paint);
+    std::wstring currentLine;
+    int lineIndex{ 0 };
+    for (size_t i = 0; i < text.size(); ++i) {
+        if (text[i] == L'\n' || (text[i] == L'\r' && (i + 1 < text.size() && text[i + 1] == L'\n'))) {
+            // 如果遇到 '\n' 或者 '\r\n'（Windows换行），调用特定方法
+            paintOneLine(currentLine, lineIndex,canvas);
+            lineIndex += 1;
+            // 清空当前行准备处理下一行
+            currentLine.clear();
+            // 如果是 "\r\n" 组合，跳过 '\r'
+            if (text[i] == L'\r' && i + 1 < text.size() && text[i + 1] == L'\n') {
+                ++i; // 跳过下一个 '\n'
+            }
+        }
+        else {
+            // 否则将当前字符添加到当前行
+            currentLine.push_back(text[i]);
+        }
+    }
+    // 处理最后一行（如果文本没有以换行符结束）
+    if (!currentLine.empty()) {
+        paintOneLine(currentLine, lineIndex, canvas);
+    }
+    if (caretLineIndex < 0) {
+        caretLineIndex = wordPos.size() - 1;
+    }
+    if (caretWordIndex < 0) {
+        caretWordIndex = wordPos[wordPos.size() - 1].size()-1;
+    }
     caretVisible = true;
     flashCaret();
 }
@@ -67,9 +102,10 @@ void WindowInput::paintText()
 void WindowInput::flashCaret()
 {
     auto color = caretVisible ? 0xFF00FFFF : 0xFF345678;
-    auto x = wordPos[caretIndex].fX,y = wordPos[caretIndex].fY;
-    SkPoint start = SkPoint(x, y + fontTop);// 字符顶部相对于基线的偏移  neagtive
-    SkPoint end = SkPoint(x, y + fontBottom); // 字符底部相对于基线的偏移
+    SkPoint& p = wordPos[caretLineIndex][caretWordIndex];
+    auto height{ fontBottom - fontTop };
+    SkPoint start = SkPoint(p.fX, p.fY + fontTop+caretLineIndex*height);// 字符顶部相对于基线的偏移  neagtive
+    SkPoint end = SkPoint(p.fX, p.fY + fontBottom + caretLineIndex * height); // 字符底部相对于基线的偏移
     SkCanvas* canvas = surface->getCanvas();
     SkPaint paint;
     paint.setColor(color);
@@ -188,17 +224,27 @@ void WindowInput::onKeyDown(const unsigned int& val)
     else if (val == VK_DOWN) {
     }
     else if (val == VK_LEFT) {
-        caretIndex -= 1;
-        if (caretIndex < 0) {
-            caretIndex = 0;
+        caretWordIndex -= 1;
+        if (caretWordIndex < 0) {
+            if (caretLineIndex <= wordPos.size()) {
+                caretWordIndex = 0;
+                return;
+            }
+            caretLineIndex -= 1;
+            caretWordIndex = 0;
         }
         paintText();
         InvalidateRect(hwnd, nullptr, false);
     }
     else if (val == VK_RIGHT) {
-        caretIndex += 1;
-        if (caretIndex >= wordPos.size()) {
-            caretIndex = wordPos.size()-1;
+        caretWordIndex += 1;
+        if (caretWordIndex >= wordPos[caretLineIndex].size()) {
+            if (caretLineIndex >= wordPos.size()) {
+                caretWordIndex -= 1;
+                return;
+            }
+            caretLineIndex += 1;
+            caretWordIndex = 0;
         }
         paintText();
         InvalidateRect(hwnd, nullptr, false);
@@ -266,7 +312,7 @@ void WindowInput::onChar(const unsigned int& val)
         //    auto str2 = lines[lineIndex].substr(wordIndex);
         //    lines[lineIndex] = str1 + word + str2;
         //}
-        caretIndex += 1;
+        caretWordIndex += 1;
         paintText();
         InvalidateRect(hwnd, nullptr, false);
         activeKeyboard();
@@ -372,8 +418,8 @@ void WindowInput::activeKeyboard()
 {
     if (HIMC himc = ImmGetContext(hwnd))
     {
-        auto x = wordPos[caretIndex].fX;
-        auto y = wordPos[caretIndex].fY;
+        auto x = wordPos[caretLineIndex][caretWordIndex].fX;
+        auto y = wordPos[caretLineIndex][caretWordIndex].fY;
         COMPOSITIONFORM comp = {};
         comp.ptCurrentPos.x = x;
         comp.ptCurrentPos.y = y;
