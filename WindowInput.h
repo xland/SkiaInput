@@ -29,15 +29,22 @@ private:
 	bool enableAlpha();
 	void activeKeyboard();
 	void paintLine(const std::wstring& text,const int& lineIndex,SkCanvas* canvas);
-	void onEnter();
-	void onBackspace();
+
 	void onMouseDown(const int& x, const int& y);
 	void onDoubleClick(const int& x, const int& y);
 	void onMouseUp(const int& x, const int& y);
 	void onMouseDrag(const int& x, const int& y);
 	void onMouseMove(const int& x, const int& y);
 	void onMouseDownRight(const int& x, const int& y);
+
 	void onKeyDown(const unsigned int& val);
+	void onKeyEnter();
+	void onKeyBackspace();
+	void onKeyLeft();
+	void onKeyUp();
+	void onKeyRight();
+	void onKeyDown();
+
 	void onChar(const unsigned int& val);
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam);
@@ -47,7 +54,7 @@ private:
 	sk_sp<SkSurface> surface;
 	
 	SkFont font;
-	float fontTop, fontBottom;
+	float fontTop, fontBottom,fontAsent,fontDesent;//fontAsent从基线到字体中最高字符顶部的距离,fTop 是从基线到字体中理论上最高点的距离。
 	std::vector<std::wstring> lines;
 	std::map<int, std::vector<SkPoint>> wordPos;
 	bool caretVisible{ true };

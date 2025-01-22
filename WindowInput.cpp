@@ -36,6 +36,8 @@ void WindowInput::initFont()
     font.getMetrics(&metrics);
     fontTop = metrics.fTop;
     fontBottom = metrics.fBottom;
+	fontAsent = metrics.fAscent;
+	fontDesent = metrics.fDescent;
 }
 
 void WindowInput::paintLine(const std::wstring& text, const int& lineIndex,SkCanvas* canvas)
@@ -59,60 +61,6 @@ void WindowInput::paintLine(const std::wstring& text, const int& lineIndex,SkCan
     }
     wordPos[lineIndex].push_back(SkPoint::Make(x, height));
     canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos[lineIndex].data(), SkPoint(0, lineIndex * height), font, paint);
-}
-
-void WindowInput::onEnter()
-{
-    if (caretWordIndex != lines[caretWordIndex].length()) {
-        auto str1 = lines[caretLineIndex].substr(0, caretWordIndex);
-        auto str2 = lines[caretLineIndex].substr(caretWordIndex);
-        lines[caretLineIndex] = str1;
-        lines.insert(lines.begin() + caretLineIndex + 1, str2);
-    }
-    else
-    {
-        lines.push_back(L"");
-    }
-    caretLineIndex += 1;
-    caretWordIndex = 0;
-    paintText();
-    InvalidateRect(hwnd, nullptr, false);
-}
-
-void WindowInput::onBackspace()
-{
-    if (lines.size() == 0) {
-        return;
-    }
-    if (caretWordIndex == 0) {
-        if (caretLineIndex == 0) {
-            return;
-        }
-        else {
-            caretWordIndex = lines[caretLineIndex - 1].size();
-            lines[caretLineIndex - 1] = lines[caretLineIndex - 1] + lines[caretLineIndex];
-            lines.erase(lines.begin() + caretLineIndex);
-            caretLineIndex -= 1;
-            paintText();
-            InvalidateRect(hwnd, nullptr, false);
-            return;
-        }
-    }
-    lines[caretLineIndex] = lines[caretLineIndex].substr(0, caretWordIndex - 1) + lines[caretLineIndex].substr(caretWordIndex);
-    if (lines[caretLineIndex].empty()) {
-        lines.erase(lines.begin() + caretLineIndex);
-        caretLineIndex -= 1;
-        if (caretLineIndex < 0) {
-            caretLineIndex = 0;
-            caretWordIndex = 0;
-        }
-        else {
-            caretWordIndex = lines[caretLineIndex].length();
-        }
-    }
-    else {
-        caretWordIndex -= 1;
-    }
 }
 
 
@@ -140,7 +88,13 @@ void WindowInput::paintText()
 void WindowInput::flashCaret()
 {
     auto color = caretVisible ? 0xFF00FFFF : 0xFF345678;
-    SkPoint& p = wordPos[caretLineIndex][caretWordIndex];
+    SkPoint p;
+    if (caretLineIndex == 0 && caretWordIndex == 0) {
+        p = SkPoint(12, 0-fontTop+fontDesent);
+    }
+    else {
+        p = wordPos[caretLineIndex][caretWordIndex];
+    }
     auto height{ fontBottom - fontTop };
     SkPoint start = SkPoint(p.fX, p.fY + fontTop+caretLineIndex*height);// 字符顶部相对于基线的偏移  neagtive
     SkPoint end = SkPoint(p.fX, p.fY + fontBottom + caretLineIndex * height); // 字符底部相对于基线的偏移
@@ -265,102 +219,22 @@ bool WindowInput::enableAlpha()
     }
 }
 
-void WindowInput::onMouseDown(const int& x, const int& y)
-{
-}
-
-void WindowInput::onDoubleClick(const int& x, const int& y)
-{
-}
-
-void WindowInput::onMouseUp(const int& x, const int& y)
-{
-}
-
-void WindowInput::onMouseDrag(const int& x, const int& y)
-{
-}
-
-void WindowInput::onMouseMove(const int& x, const int& y)
-{
-}
-
-void WindowInput::onMouseDownRight(const int& x, const int& y)
-{
-}
-
-void WindowInput::onKeyDown(const unsigned int& val)
-{
-    if (val == VK_UP) {
-        if (caretLineIndex <= 0) return;
-        caretLineIndex -= 1;
-        if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
-            caretWordIndex = wordPos[caretLineIndex].size() - 1;
-        }
-        paintText();
-        InvalidateRect(hwnd, nullptr, false);
-    }
-    else if (val == VK_DOWN) {
-        if (caretLineIndex >= wordPos.size()-1) return;
-        caretLineIndex += 1;
-        if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
-            caretWordIndex = wordPos[caretLineIndex].size() - 1;
-        }
-        paintText();
-        InvalidateRect(hwnd, nullptr, false);
-    }
-    else if (val == VK_LEFT) {
-        caretWordIndex -= 1;
-        if (caretWordIndex < 0) {
-            if (caretLineIndex <= 0) {
-                caretWordIndex = 0;
-                return;
-            }
-            caretLineIndex -= 1;
-            caretWordIndex = wordPos[caretLineIndex].size()-1;
-        }
-        paintText();
-        InvalidateRect(hwnd, nullptr, false);
-    }
-    else if (val == VK_RIGHT) {
-        caretWordIndex += 1;
-        if (caretWordIndex >= wordPos[caretLineIndex].size()) {
-            if (caretLineIndex >= wordPos.size()-1) {
-                caretWordIndex -= 1;
-                return;
-            }
-            caretLineIndex += 1;
-            caretWordIndex = 0;
-        }
-        paintText();
-        InvalidateRect(hwnd, nullptr, false);
-    }
-}
-
 void WindowInput::onChar(const unsigned int& val)
 {
-    if (val == 13) { //enter
-        onEnter();
-    }
-    else if (val == 8) { //backspace 删除一个字
-        onBackspace();
-    }
-    else {
         std::wstring word{ (wchar_t)val };
         //text = text+word;
-        //if (lines.size() == 0) {
-        //    text.push_back(word);
-        //}
-        //else {
-        //    auto str1 = lines[lineIndex].substr(0, wordIndex);
-        //    auto str2 = lines[lineIndex].substr(wordIndex);
-        //    lines[lineIndex] = str1 + word + str2;
-        //}
+        if (lines.size() == 0) {
+            lines.push_back(word);
+        }
+        else {
+            auto str1 = lines[caretLineIndex].substr(0, caretWordIndex);
+            auto str2 = lines[caretLineIndex].substr(caretWordIndex);
+            lines[caretLineIndex] = str1 + word + str2;
+        }
         caretWordIndex += 1;
         paintText();
         InvalidateRect(hwnd, nullptr, false);
         activeKeyboard();
-    }
 }
 
 LRESULT WindowInput::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -453,6 +327,7 @@ LRESULT WindowInput::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     else if (msg == WM_CHAR) {
+		if (!iswprint(wParam)) return 0;
         onChar(wParam);
         return 0;
     }
@@ -463,7 +338,7 @@ void WindowInput::activeKeyboard()
     if (HIMC himc = ImmGetContext(hwnd))
     {
         auto x = wordPos[caretLineIndex][caretWordIndex].fX;
-        auto y = wordPos[caretLineIndex][caretWordIndex].fY;
+        auto y = wordPos[caretLineIndex][caretWordIndex].fY + caretLineIndex * (fontBottom - fontTop);
         COMPOSITIONFORM comp = {};
         comp.ptCurrentPos.x = x;
         comp.ptCurrentPos.y = y;
