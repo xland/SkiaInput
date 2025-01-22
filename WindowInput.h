@@ -23,11 +23,14 @@ private:
 	void initWindow();
 	void initSurface();
 	void initFont();
+
+	bool enableAlpha();
+	void activeKeyboard();
+
 	void paint();
 	void paintText();
 	void flashCaret();
-	bool enableAlpha();
-	void activeKeyboard();
+	void paintSelectedBg(SkCanvas* canvas);
 	void paintLine(const std::wstring& text,const int& lineIndex,SkCanvas* canvas);
 
 	void onMouseDown(const int& x, const int& y);
@@ -36,6 +39,7 @@ private:
 	void onMouseDrag(const int& x, const int& y);
 	void onMouseMove(const int& x, const int& y);
 	void onMouseDownRight(const int& x, const int& y);
+	std::pair<float, float> setMouseAtIndex(const int& x, const int& y);
 
 	void onKeyDown(const unsigned int& val);
 	void onKeyEnter();
@@ -58,9 +62,10 @@ private:
 	float fontTop, fontBottom,fontAsent,fontDesent;//fontAsent从基线到字体中最高字符顶部的距离,fTop 是从基线到字体中理论上最高点的距离。
 	std::vector<std::wstring> lines;
 	std::map<int, std::vector<SkPoint>> wordPos;
+
 	bool caretVisible{ true };
-	int caretLineIndex{ -1 };
-	int caretWordIndex{ -1 };
+	int caretLineIndex{ -1 },caretWordIndex{ -1 };
+	int selectStartLine{ -1 }, selectStartWord{ -1 }, selectEndLine{ -1 }, selectEndWord{ -1 };
 	float fontSize{ 26 };
 	bool isMouseDown{ false };
 };
