@@ -130,3 +130,20 @@ void WindowInput::onKeyBackspace()
     paintText();
     InvalidateRect(hwnd, nullptr, false);
 }
+
+void WindowInput::onChar(const unsigned int& val)
+{
+    std::wstring word{ (wchar_t)val };
+    if (lines.size() == 0) {
+        lines.push_back(word);
+    }
+    else {
+        auto str1 = lines[caretLineIndex].substr(0, caretWordIndex);
+        auto str2 = lines[caretLineIndex].substr(caretWordIndex);
+        lines[caretLineIndex] = str1 + word + str2;
+    }
+    caretWordIndex += 1;
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
+}

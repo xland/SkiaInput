@@ -15,7 +15,7 @@ add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE 
 	"main.cpp" 
 	"WindowInput.h" 
-	"WindowInput.cpp" "WindowInputKey.cpp" "WindowInputMouse.cpp")
+	"WindowInput.cpp" "WindowInputKey.cpp" "WindowInputMouse.cpp" "WindowInputNativeMsg.cpp")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS")
 set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DPI_AWARE "PerMonitor")

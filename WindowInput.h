@@ -44,8 +44,9 @@ private:
 	void onKeyUp();
 	void onKeyRight();
 	void onKeyDown();
-
 	void onChar(const unsigned int& val);
+
+	
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam);
 private:
