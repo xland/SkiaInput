@@ -49,7 +49,13 @@ private:
 	void onKeyUp();
 	void onKeyRight();
 	void onKeyDown();
+	void onCopy();
+	void onPaste();
+	void onCut();
 	void onChar(const unsigned int& val);
+
+	std::array<int, 4> getStartEnd();
+	void saveToClipboard(const std::wstring& str);
 
 	
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
