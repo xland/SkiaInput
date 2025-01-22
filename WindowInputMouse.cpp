@@ -24,9 +24,8 @@ void WindowInput::onMouseUp(const int& x, const int& y)
 void WindowInput::onMouseDrag(const int& x, const int& y)
 {
 	auto lwIndex = setMouseAtIndex(x, y);
-	if (lwIndex.first == selectStartLine && lwIndex.second == selectStartWord) {
-		return;
-	}
+	caretLineIndex = lwIndex.first;
+	caretWordIndex = lwIndex.second;
 	selectEndLine = lwIndex.first;
 	selectEndWord = lwIndex.second;
 	paintText();
