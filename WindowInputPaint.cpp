@@ -26,7 +26,9 @@ void WindowInput::paintSelectedBg(SkCanvas* canvas) {
     if (selectStartLine == -1 || selectStartWord == -1 || selectEndLine == -1 || selectEndWord == -1) {
         return;
     }
-
+	if (selectStartLine == selectEndLine && selectStartWord == selectEndWord) {
+		return;
+	}
     int startLine{ selectStartLine }, startWord{ selectStartWord }, 
         endLine{ selectEndLine }, endWord{ selectEndWord };
     if (selectEndLine < selectStartLine) {

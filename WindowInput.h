@@ -44,6 +44,7 @@ private:
 	void onKeyDown(const unsigned int& val);
 	void onKeyEnter();
 	void onKeyBackspace();
+	void onKeyDelete();
 	void onKeyLeft();
 	void onKeyUp();
 	void onKeyRight();

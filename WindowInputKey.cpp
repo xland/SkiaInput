@@ -21,7 +21,11 @@ void WindowInput::onKeyDown(const unsigned int& val)
     else if (val == VK_BACK) {
         onKeyBackspace();
     }
+    else if (val == VK_DELETE) {
+        onKeyDelete();
+    }
 }
+
 
 void WindowInput::onKeyLeft() {
     caretWordIndex -= 1;
@@ -90,7 +94,35 @@ void WindowInput::onKeyEnter()
     paintText();
     InvalidateRect(hwnd, nullptr, false);
 }
-
+void WindowInput::onKeyDelete() {
+    if (lines.size() == 0) {
+        return;
+    }
+    if (caretWordIndex == lines[caretLineIndex].size()) {
+        if (caretLineIndex == lines.size() - 1) {
+            return;
+        }
+        else {
+            lines[caretLineIndex] = lines[caretLineIndex] + lines[caretLineIndex + 1];
+            lines.erase(lines.begin() + caretLineIndex + 1);
+            activeKeyboard();
+            paintText();
+            InvalidateRect(hwnd, nullptr, false);
+            return;
+        }
+    }
+    lines[caretLineIndex] = lines[caretLineIndex].substr(0, caretWordIndex) + lines[caretLineIndex].substr(caretWordIndex + 1);
+    if (lines[caretLineIndex].empty()) {
+        lines.erase(lines.begin() + caretLineIndex);
+        if (caretLineIndex >= lines.size()) {
+            caretLineIndex = lines.size() - 1;
+            caretWordIndex = lines[caretLineIndex].length();
+        }
+    }
+    activeKeyboard();
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+}
 void WindowInput::onKeyBackspace()
 {
     if (lines.size() == 0) {
