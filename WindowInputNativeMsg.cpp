@@ -98,3 +98,51 @@ LRESULT WindowInput::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
     }
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
+
+void WindowInput::onKeyDown(const unsigned int& val)
+{
+    if (val == VK_UP) {
+        onKeyUp();
+    }
+    else if (val == VK_DOWN) {
+        onKeyDown();
+    }
+    else if (val == VK_LEFT) {
+        onKeyLeft();
+    }
+    else if (val == VK_RIGHT) {
+        onKeyRight();
+    }
+    else if (val == VK_RETURN) {
+        onKeyEnter();
+    }
+    else if (val == VK_BACK) {
+        onKeyBackspace();
+    }
+    else if (val == VK_DELETE) {
+        onKeyDelete();
+    }
+    else {
+        bool ctrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        if (ctrlPressed) {
+            if (val == 'C') {
+                onCopy();
+            }
+            else if (val == 'V') {
+                onPaste();
+            }
+            else if (val == 'X') {
+                onCut();
+            }
+            else if (val == 'A') {
+                onSelectAll();
+            }
+            else if (val == 'Z') {
+                //todo 
+            }
+            else if (val == 'Y') {
+                //todo
+            }
+        }
+    }
+}

@@ -152,15 +152,17 @@ void WindowInput::deleteSelection() {
     }
     caretLineIndex = startLine;
     caretWordIndex = startWord;
-    selectStartLine = -1;
-    selectStartWord = -1;
-    selectEndLine = -1;
-    selectEndWord = -1;
+    cancelSelection();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
     activeKeyboard();
 }
-
+void  WindowInput::cancelSelection() {
+    selectStartLine = -1;
+    selectStartWord = -1;
+    selectEndLine = -1;
+    selectEndWord = -1;
+}
 void WindowInput::activeKeyboard()
 {
     if (HIMC himc = ImmGetContext(hwnd))

@@ -1,47 +1,8 @@
 #include "WindowInput.h"
 
-void WindowInput::onKeyDown(const unsigned int& val)
-{
-    if (val == VK_UP) {
-        onKeyUp();
-    }
-    else if (val == VK_DOWN) {
-        onKeyDown();    
-    }
-    else if (val == VK_LEFT) {
-		onKeyLeft();
-    }
-    else if (val == VK_RIGHT) {
-		onKeyRight();
-    }
-    else if (val == VK_RETURN) {
-        onKeyEnter();
-    }
-    else if (val == VK_BACK) {
-        onKeyBackspace();
-    }
-    else if (val == VK_DELETE) {
-        onKeyDelete();
-	}
-    else {
-        bool ctrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-        if (ctrlPressed) {
-			if (val == 'C') {
-                onCopy();
-			}
-			else if (val == 'V') {
-				onPaste();
-			}
-			else if (val == 'X') {
-                onCut();
-			}
-            else if (val == 'A') {
-                onSelectAll();
-            }
-        }
-    }
-}
+
 void WindowInput::onKeyLeft() {
+    cancelSelection();
     caretWordIndex -= 1;
     if (caretWordIndex < 0) {
         if (caretLineIndex <= 0) {
@@ -56,6 +17,7 @@ void WindowInput::onKeyLeft() {
     InvalidateRect(hwnd, nullptr, false);
 }
 void WindowInput::onKeyUp() {
+    cancelSelection();
     if (caretLineIndex <= 0) return;
     caretLineIndex -= 1;
     if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
@@ -65,7 +27,32 @@ void WindowInput::onKeyUp() {
     paintText();
     InvalidateRect(hwnd, nullptr, false);
 }
-
+void WindowInput::onKeyRight() {
+    cancelSelection();
+    caretWordIndex += 1;
+    if (caretWordIndex >= wordPos[caretLineIndex].size()) {
+        if (caretLineIndex >= wordPos.size() - 1) {
+            caretWordIndex -= 1;
+            return;
+        }
+        caretLineIndex += 1;
+        caretWordIndex = 0;
+    }
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
+}
+void WindowInput::onKeyDown() {
+    cancelSelection();
+    if (caretLineIndex >= wordPos.size() - 1) return;
+    caretLineIndex += 1;
+    if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
+        caretWordIndex = wordPos[caretLineIndex].size() - 1;
+    }
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
+}
 
 void WindowInput::onCopy() {
     if (!hasSelection()) {
@@ -123,10 +110,7 @@ void WindowInput::onPaste() {
         }
         caretLineIndex = startLine;
         caretWordIndex = startWord;
-        selectStartLine = -1;
-        selectStartWord = -1;
-        selectEndLine = -1;
-        selectEndWord = -1;
+        cancelSelection();
     }
     auto cLines = textToLines(clipboardStr);
     auto tempStr = lines[caretLineIndex].substr(caretWordIndex);
@@ -204,35 +188,7 @@ void WindowInput::onCut() {
 	saveToClipboard(str);
     caretLineIndex = startLine;
     caretWordIndex = startWord;
-    selectStartLine = -1;
-    selectStartWord = -1; 
-    selectEndLine = -1;
-    selectEndWord = -1;
-    paintText();
-    InvalidateRect(hwnd, nullptr, false);
-    activeKeyboard();
-}
-
-void WindowInput::onKeyRight() {
-    caretWordIndex += 1;
-    if (caretWordIndex >= wordPos[caretLineIndex].size()) {
-        if (caretLineIndex >= wordPos.size() - 1) {
-            caretWordIndex -= 1;
-            return;
-        }
-        caretLineIndex += 1;
-        caretWordIndex = 0;
-    }
-    paintText();
-    InvalidateRect(hwnd, nullptr, false);
-    activeKeyboard();
-}
-void WindowInput::onKeyDown() {
-    if (caretLineIndex >= wordPos.size() - 1) return;
-    caretLineIndex += 1;
-    if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
-        caretWordIndex = wordPos[caretLineIndex].size() - 1;
-    }
+    cancelSelection();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
     activeKeyboard();

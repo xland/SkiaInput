@@ -20,10 +20,7 @@ void WindowInput::onDoubleClick(const int& x, const int& y)
 void WindowInput::onMouseUp(const int& x, const int& y)
 {
 	if (selectEndLine == -1 || selectEndWord == -1 ||(selectStartLine == selectEndLine && selectStartWord == selectEndWord)) {
-		selectEndLine == -1;
-		selectEndWord == -1;
-		selectStartLine = -1;
-		selectStartWord = -1;
+		cancelSelection();
 	}
 }
 

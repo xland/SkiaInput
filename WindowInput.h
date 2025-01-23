@@ -28,6 +28,7 @@ private:
 	void activeKeyboard();
 	bool hasSelection();
 	void deleteSelection();
+	void cancelSelection();
 	std::wstring getClipboardText();
 	std::array<int, 4> getSelectionArea();
 	void saveToClipboard(const std::wstring& str);
