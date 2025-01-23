@@ -10,7 +10,6 @@ void WindowInput::onKeyDown(const unsigned int& val)
     }
     else if (val == VK_LEFT) {
 		onKeyLeft();
-
     }
     else if (val == VK_RIGHT) {
 		onKeyRight();
@@ -31,16 +30,17 @@ void WindowInput::onKeyDown(const unsigned int& val)
                 onCopy();
 			}
 			else if (val == 'V') {
-				// paste
+				onPaste();
 			}
 			else if (val == 'X') {
                 onCut();
 			}
+            else if (val == 'A') {
+                onSelectAll();
+            }
         }
     }
 }
-
-
 void WindowInput::onKeyLeft() {
     caretWordIndex -= 1;
     if (caretWordIndex < 0) {
@@ -91,7 +91,82 @@ void WindowInput::onCopy() {
     saveToClipboard(str);
 }
 void WindowInput::onPaste() {
+	auto clipboardStr = getClipboardText();
+    if (clipboardStr.empty())
+    {
+        return;
+    }
+    auto [startLine, startWord, endLine, endWord] = getStartEnd();
+    if (selectStartLine != -1 && selectEndLine != -1 && selectStartWord != -1 && selectEndWord != -1) {
+        if (startLine == endLine)
+        {
+            lines[startLine] = lines[startLine].substr(0, startWord) + lines[startLine].substr(endWord);
+        }
+        else {
+            std::vector<int> delIndexs;
+            for (size_t i = startLine; i <= endLine; i++)
+            {
+                int start{ 0 }, end = lines[i].size() - 1;
+                if (i == startLine) {
+                    start = startWord;
+                    lines[i] = lines[i].substr(0, start);
+                }
+                if (i == endLine) {
+                    end = endWord;
+                    lines[startLine] = lines[startLine] + lines[i].substr(end);
+                }
+                if (start == 0)
+                {
+                    delIndexs.push_back(i);
+                }
+            }
+            for (int i = delIndexs.size() - 1; i >= 0; --i) {
+                lines.erase(lines.begin() + delIndexs[i]);
+            }
+        }
+        caretLineIndex = startLine;
+        caretWordIndex = startWord;
+        selectStartLine = -1;
+        selectStartWord = -1;
+        selectEndLine = -1;
+        selectEndWord = -1;
+    }
+    auto cLines = textToLines(clipboardStr);
+    auto tempStr = lines[caretLineIndex].substr(caretWordIndex);
+	if (cLines.size() == 1)
+	{
+        lines[caretLineIndex] = lines[caretLineIndex].substr(0, caretWordIndex) + cLines[0] + tempStr;
+		caretWordIndex = caretWordIndex + cLines[0].size();
+    }
+    else if (cLines.size() == 2) {
+        lines[caretLineIndex] = lines[caretLineIndex].substr(0, caretWordIndex) + cLines[0];
+		lines.insert(lines.begin() + caretLineIndex+1, cLines[1]+ tempStr);
+		caretLineIndex += 1;
+        caretWordIndex = cLines[1].size();
+    }
+    else {
+        lines[caretLineIndex] = lines[caretLineIndex].substr(0, caretWordIndex) + cLines[0];
+        lines.insert(lines.begin() + caretLineIndex + 1, cLines.begin()+1,cLines.end()-1);
+		lines.insert(lines.begin() + caretLineIndex + cLines.size() - 1, cLines[cLines.size() - 1] + tempStr);
+        caretLineIndex += cLines.size()-1;
+        caretWordIndex = cLines[1].size();
+    }
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 
+}
+void WindowInput::onSelectAll() {
+    if (lines.size() == 0) {
+        return;
+    }
+    selectStartLine = 0;
+    selectStartWord = 0;
+    selectEndLine = lines.size() - 1;
+    selectEndWord = lines[selectEndLine].size();
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 void WindowInput::onCut() {
     if (selectStartLine == -1 || selectStartWord == -1 || selectEndLine == -1 || selectEndWord == -1) {
@@ -102,38 +177,46 @@ void WindowInput::onCut() {
     }
     auto [startLine, startWord, endLine, endWord] = getStartEnd();
     std::wstring str;
-    std::vector<int> delIndexs;
-    for (size_t i = startLine; i <= endLine; i++)
+    if (startLine == endLine) 
     {
-        int start{ 0 }, end = lines[i].size() - 1;
-        if (i == startLine) {
-            start = startWord;
-            lines[i] = lines[i].substr(0, start);
+        lines[startLine] = lines[startLine].substr(0, startWord) + lines[startLine].substr(endWord);
+        str += lines[startLine].substr(startWord, endWord - startWord);
+	}
+    else 
+    {
+        std::vector<int> delIndexs;
+        for (size_t i = startLine; i <= endLine; i++)
+        {
+            int start{ 0 }, end = lines[i].size() - 1;
+            if (i == startLine) {
+                start = startWord;
+                lines[i] = lines[i].substr(0, start);
+            }
+            if (i == endLine) {
+                end = endWord;
+                lines[startLine] = lines[startLine] + lines[i].substr(end);
+            }
+            if (start == 0)
+            {
+                delIndexs.push_back(i);
+            }
+            str += lines[i].substr(start, end - start) + L"\n";
         }
-        if (i == endLine) {
-            end = endWord;
-            lines[i] = lines[i].substr(end);
+        str.pop_back();
+        for (int i = delIndexs.size() - 1; i >= 0; --i) {
+            lines.erase(lines.begin() + delIndexs[i]);
         }
-		if (start == 0 && end == lines[i].size() - 1)
-		{
-			delIndexs.push_back(i);
-		}
-        str += lines[i].substr(start, end - start) + L"\n";
     }
-    str.pop_back();
 	saveToClipboard(str);
-    for (int i = delIndexs.size() - 1; i >= 0; --i) {
-        lines.erase(lines.begin() + delIndexs[i]);
-    }
     caretLineIndex = startLine;
     caretWordIndex = startWord;
     selectStartLine = -1;
     selectStartWord = -1; 
     selectEndLine = -1;
     selectEndWord = -1;
-    activeKeyboard();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 
 void WindowInput::onKeyRight() {
@@ -146,9 +229,9 @@ void WindowInput::onKeyRight() {
         caretLineIndex += 1;
         caretWordIndex = 0;
     }
-    activeKeyboard();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 void WindowInput::onKeyDown() {
     if (caretLineIndex >= wordPos.size() - 1) return;
@@ -156,9 +239,9 @@ void WindowInput::onKeyDown() {
     if (caretWordIndex >= wordPos[caretLineIndex].size() - 1) {
         caretWordIndex = wordPos[caretLineIndex].size() - 1;
     }
-    activeKeyboard();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 
 void WindowInput::onKeyEnter()
@@ -175,9 +258,9 @@ void WindowInput::onKeyEnter()
     }
     caretLineIndex += 1;
     caretWordIndex = 0;
-    activeKeyboard();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 void WindowInput::onKeyDelete() {
     if (lines.size() == 0) {
@@ -190,9 +273,9 @@ void WindowInput::onKeyDelete() {
         else {
             lines[caretLineIndex] = lines[caretLineIndex] + lines[caretLineIndex + 1];
             lines.erase(lines.begin() + caretLineIndex + 1);
-            activeKeyboard();
             paintText();
             InvalidateRect(hwnd, nullptr, false);
+            activeKeyboard();
             return;
         }
     }
@@ -204,9 +287,9 @@ void WindowInput::onKeyDelete() {
             caretWordIndex = lines[caretLineIndex].length();
         }
     }
-    activeKeyboard();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 void WindowInput::onKeyBackspace()
 {
@@ -222,9 +305,9 @@ void WindowInput::onKeyBackspace()
             lines[caretLineIndex - 1] = lines[caretLineIndex - 1] + lines[caretLineIndex];
             lines.erase(lines.begin() + caretLineIndex);
             caretLineIndex -= 1;
-            activeKeyboard();
             paintText();
             InvalidateRect(hwnd, nullptr, false);
+            activeKeyboard();
             return;
         }
     }
@@ -243,9 +326,9 @@ void WindowInput::onKeyBackspace()
     else {
         caretWordIndex -= 1;
     }
-    activeKeyboard();
     paintText();
     InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 
 void WindowInput::onChar(const unsigned int& val)

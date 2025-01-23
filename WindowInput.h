@@ -26,6 +26,10 @@ private:
 
 	bool enableAlpha();
 	void activeKeyboard();
+	std::wstring getClipboardText();
+	std::array<int, 4> getStartEnd();
+	void saveToClipboard(const std::wstring& str);
+	std::vector<std::wstring> textToLines(const std::wstring& text);
 
 	void paint();
 	void paintText();
@@ -52,10 +56,10 @@ private:
 	void onCopy();
 	void onPaste();
 	void onCut();
+	void onSelectAll();
 	void onChar(const unsigned int& val);
 
-	std::array<int, 4> getStartEnd();
-	void saveToClipboard(const std::wstring& str);
+	
 
 	
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
