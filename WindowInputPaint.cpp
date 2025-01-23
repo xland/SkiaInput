@@ -29,7 +29,7 @@ void WindowInput::paintSelectedBg(SkCanvas* canvas) {
 	if (selectStartLine == selectEndLine && selectStartWord == selectEndWord) {
 		return;
 	}
-    auto [startLine, startWord, endLine, endWord ] = getStartEnd();
+    auto [startLine, startWord, endLine, endWord ] = getSelectionArea();
     auto height{ fontBottom - fontTop };
     SkPaint paint;
     paint.setColor(0X66FFFFFF);

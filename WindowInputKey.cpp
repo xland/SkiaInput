@@ -68,13 +68,10 @@ void WindowInput::onKeyUp() {
 
 
 void WindowInput::onCopy() {
-    if (selectStartLine == -1 || selectStartWord == -1 || selectEndLine == -1 || selectEndWord == -1) {
+    if (!hasSelection()) {
         return;
     }
-    if (selectStartLine == selectEndLine && selectStartWord == selectEndWord) {
-        return;
-    }
-    auto [startLine, startWord, endLine, endWord] = getStartEnd();
+    auto [startLine, startWord, endLine, endWord] = getSelectionArea();
     std::wstring str;
     for (size_t i = startLine; i <= endLine; i++)
     {
@@ -96,7 +93,7 @@ void WindowInput::onPaste() {
     {
         return;
     }
-    auto [startLine, startWord, endLine, endWord] = getStartEnd();
+    auto [startLine, startWord, endLine, endWord] = getSelectionArea();
     if (selectStartLine != -1 && selectEndLine != -1 && selectStartWord != -1 && selectEndWord != -1) {
         if (startLine == endLine)
         {
@@ -169,13 +166,10 @@ void WindowInput::onSelectAll() {
     activeKeyboard();
 }
 void WindowInput::onCut() {
-    if (selectStartLine == -1 || selectStartWord == -1 || selectEndLine == -1 || selectEndWord == -1) {
+    if (!hasSelection()) {
         return;
     }
-    if (selectStartLine == selectEndLine && selectStartWord == selectEndWord) {
-        return;
-    }
-    auto [startLine, startWord, endLine, endWord] = getStartEnd();
+    auto [startLine, startWord, endLine, endWord] = getSelectionArea();
     std::wstring str;
     if (startLine == endLine) 
     {
@@ -246,6 +240,9 @@ void WindowInput::onKeyDown() {
 
 void WindowInput::onKeyEnter()
 {
+    if (hasSelection()) {
+        deleteSelection();
+    }
     if (caretWordIndex != lines[caretWordIndex].length()) {
         auto str1 = lines[caretLineIndex].substr(0, caretWordIndex);
         auto str2 = lines[caretLineIndex].substr(caretWordIndex);
@@ -263,7 +260,8 @@ void WindowInput::onKeyEnter()
     activeKeyboard();
 }
 void WindowInput::onKeyDelete() {
-    if (lines.size() == 0) {
+    if (hasSelection()) {
+		deleteSelection();
         return;
     }
     if (caretWordIndex == lines[caretLineIndex].size()) {
@@ -293,7 +291,8 @@ void WindowInput::onKeyDelete() {
 }
 void WindowInput::onKeyBackspace()
 {
-    if (lines.size() == 0) {
+    if (hasSelection()) {
+        deleteSelection();
         return;
     }
     if (caretWordIndex == 0) {
@@ -333,6 +332,9 @@ void WindowInput::onKeyBackspace()
 
 void WindowInput::onChar(const unsigned int& val)
 {
+    if (hasSelection()) {
+        deleteSelection();
+    }
     std::wstring word{ (wchar_t)val };
     if (lines.size() == 0) {
         lines.push_back(word);

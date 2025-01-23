@@ -26,8 +26,10 @@ private:
 
 	bool enableAlpha();
 	void activeKeyboard();
+	bool hasSelection();
+	void deleteSelection();
 	std::wstring getClipboardText();
-	std::array<int, 4> getStartEnd();
+	std::array<int, 4> getSelectionArea();
 	void saveToClipboard(const std::wstring& str);
 	std::vector<std::wstring> textToLines(const std::wstring& text);
 

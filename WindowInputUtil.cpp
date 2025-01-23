@@ -3,7 +3,7 @@
 #include "WindowInput.h"
 
 
-std::array<int, 4> WindowInput::getStartEnd() {
+std::array<int, 4> WindowInput::getSelectionArea() {
     int startLine{ selectStartLine }, 
         startWord{ selectStartWord },
         endLine{ selectEndLine }, 
@@ -113,6 +113,52 @@ bool WindowInput::enableAlpha()
         DwmEnableBlurBehindWindow(hwnd, &bb);
         return false;
     }
+}
+bool WindowInput::hasSelection() {
+    if (lines.size() == 0) {
+        return false;
+    }
+	return selectStartLine != -1 && selectStartWord != -1 && selectEndLine != -1 && selectEndWord != -1;
+}
+
+void WindowInput::deleteSelection() {
+    auto [startLine, startWord, endLine, endWord] = getSelectionArea();
+    if (startLine == endLine)
+    {
+        lines[startLine] = lines[startLine].substr(0, startWord) + lines[startLine].substr(endWord);
+    }
+    else
+    {
+        std::vector<int> delIndexs;
+        for (size_t i = startLine; i <= endLine; i++)
+        {
+            int start{ 0 }, end = lines[i].size() - 1;
+            if (i == startLine) {
+                start = startWord;
+                lines[i] = lines[i].substr(0, start);
+            }
+            if (i == endLine) {
+                end = endWord;
+                lines[startLine] = lines[startLine] + lines[i].substr(end);
+            }
+            if (start == 0)
+            {
+                delIndexs.push_back(i);
+            }
+        }
+        for (int i = delIndexs.size() - 1; i >= 0; --i) {
+            lines.erase(lines.begin() + delIndexs[i]);
+        }
+    }
+    caretLineIndex = startLine;
+    caretWordIndex = startWord;
+    selectStartLine = -1;
+    selectStartWord = -1;
+    selectEndLine = -1;
+    selectEndWord = -1;
+    paintText();
+    InvalidateRect(hwnd, nullptr, false);
+    activeKeyboard();
 }
 
 void WindowInput::activeKeyboard()
