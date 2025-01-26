@@ -199,7 +199,7 @@ void WindowInput::onKeyEnter()
     if (hasSelection()) {
         deleteSelection();
     }
-    if (caretWordIndex != lines[caretWordIndex].length()) {
+    if (caretWordIndex != lines[caretLineIndex].size()) {
         auto str1 = lines[caretLineIndex].substr(0, caretWordIndex);
         auto str2 = lines[caretLineIndex].substr(caretWordIndex);
         lines[caretLineIndex] = str1;

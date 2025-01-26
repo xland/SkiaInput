@@ -3,7 +3,7 @@ set(PROJECT_NAME "SkiaInput")
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 link_directories(
     "D:\\sdk\\skia\\out"
