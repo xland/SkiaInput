@@ -207,7 +207,7 @@ void WindowInput::onKeyEnter()
     }
     else
     {
-        lines.push_back(L"");
+        lines.insert(lines.begin() + caretLineIndex + 1, L"");
     }
     caretLineIndex += 1;
     caretWordIndex = 0;
