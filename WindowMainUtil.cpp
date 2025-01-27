@@ -1,9 +1,9 @@
 #include <dwmapi.h>
 #include <versionhelpers.h>
-#include "WindowInput.h"
+#include "WindowMain.h"
 
 
-std::array<int, 4> WindowInput::getSelectionArea() {
+std::array<int, 4> WindowMain::getSelectionArea() {
     int startLine{ selectStartLine }, 
         startWord{ selectStartWord },
         endLine{ selectEndLine }, 
@@ -22,7 +22,7 @@ std::array<int, 4> WindowInput::getSelectionArea() {
     }
 	return { startLine,startWord,endLine,endWord };
 }
-void WindowInput::saveToClipboard(const std::wstring& str) {
+void WindowMain::saveToClipboard(const std::wstring& str) {
     if (OpenClipboard(hwnd)) {
         EmptyClipboard();
         HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (str.size() + 1) * sizeof(wchar_t));
@@ -37,7 +37,7 @@ void WindowInput::saveToClipboard(const std::wstring& str) {
         CloseClipboard();
     }
 }
-std::wstring WindowInput::getClipboardText() {
+std::wstring WindowMain::getClipboardText() {
     if (!OpenClipboard(nullptr)) {
         return L"";
     }
@@ -57,7 +57,7 @@ std::wstring WindowInput::getClipboardText() {
 }
 
 
-std::vector<std::wstring> WindowInput::textToLines(const std::wstring& text) {
+std::vector<std::wstring> WindowMain::textToLines(const std::wstring& text) {
 
 	std::vector<std::wstring> result;
     std::wstring currentLine;
@@ -84,7 +84,7 @@ std::vector<std::wstring> WindowInput::textToLines(const std::wstring& text) {
 	return result;
 }
 
-bool WindowInput::enableAlpha()
+bool WindowMain::enableAlpha()
 {
     if (!IsWindowsVistaOrGreater()) { return false; }
     BOOL isCompositionEnable = false;
@@ -114,14 +114,14 @@ bool WindowInput::enableAlpha()
         return false;
     }
 }
-bool WindowInput::hasSelection() {
+bool WindowMain::hasSelection() {
     if (lines.size() == 0) {
         return false;
     }
 	return selectStartLine != -1 && selectStartWord != -1 && selectEndLine != -1 && selectEndWord != -1;
 }
 
-void WindowInput::deleteSelection() {
+void WindowMain::deleteSelection() {
     auto [startLine, startWord, endLine, endWord] = getSelectionArea();
     if (startLine == endLine)
     {
@@ -157,13 +157,13 @@ void WindowInput::deleteSelection() {
     InvalidateRect(hwnd, nullptr, false);
     activeKeyboard();
 }
-void  WindowInput::cancelSelection() {
+void  WindowMain::cancelSelection() {
     selectStartLine = -1;
     selectStartWord = -1;
     selectEndLine = -1;
     selectEndWord = -1;
 }
-void WindowInput::activeKeyboard()
+void WindowMain::activeKeyboard()
 {
     if (HIMC himc = ImmGetContext(hwnd))
     {
@@ -174,11 +174,11 @@ void WindowInput::activeKeyboard()
         comp.ptCurrentPos.y = y;
         comp.dwStyle = CFS_FORCE_POSITION;
         ImmSetCompositionWindow(himc, &comp);
-        CANDIDATEFORM cand = {};
-        cand.dwStyle = CFS_CANDIDATEPOS;
-        cand.ptCurrentPos.x = x;
-        cand.ptCurrentPos.y = y;
-        ImmSetCandidateWindow(himc, &cand);
+        //CANDIDATEFORM cand = {};
+        //cand.dwStyle = CFS_CANDIDATEPOS;
+        //cand.ptCurrentPos.x = x;
+        //cand.ptCurrentPos.y = y;
+        //ImmSetCandidateWindow(himc, &cand);
         ImmReleaseContext(hwnd, himc);
     }
 }

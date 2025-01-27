@@ -1,13 +1,9 @@
-# 编译Skia
-
-## Debug
-
 ```
 clang_win = "C:\Program Files\LLVM"
 cc = "clang"
 cxx = "clang++"
 extra_cflags = [ "/MTd" ]
-is_official_build = false
+is_official_build = true
 is_debug = false
 skia_use_system_expat = false
 skia_use_system_libjpeg_turbo = false
@@ -30,22 +26,15 @@ skia_enable_graphite = true
 skia_enable_gpu = true
 skia_enable_skparagraph = true
 skia_enable_skshaper = true
-skia_enable_skunicode = true
-```
 
 ```
-bin/gn gen out/debug
-ninja -C out/debug
-```
-
-## Release
 
 ```
 clang_win = "C:\Program Files\LLVM"
 cc = "clang"
 cxx = "clang++"
-extra_cflags = [ "/MT", "-O2", "-fno-exceptions", "-fno-rtti" ]
-is_official_build = false
+extra_cflags = [ "/MT" ]
+is_official_build = true
 is_debug = false
 skia_use_system_expat = false
 skia_use_system_libjpeg_turbo = false
@@ -68,8 +57,4 @@ skia_enable_graphite = true
 skia_enable_gpu = true
 skia_enable_skparagraph = true
 skia_enable_skshaper = true
-skia_enable_skunicode = true
-```
-```
-ninja -C out/release
 ```

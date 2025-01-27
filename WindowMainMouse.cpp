@@ -1,30 +1,32 @@
-#include "WindowInput.h"
+#include "WindowMain.h"
 
-void WindowInput::onMouseDown(const int& x, const int& y)
+void WindowMain::onMouseDown(const int& x, const int& y)
 {
 	auto lwIndex = setMouseAtIndex(x,y);
 	caretLineIndex = lwIndex.first;
 	caretWordIndex = lwIndex.second;
 	selectStartLine = caretLineIndex;
 	selectStartWord = caretWordIndex;
+	selectEndLine = -1;
+	selectEndWord = -1;
 	paintText();
 	InvalidateRect(hwnd, nullptr, false);
 	activeKeyboard();
 }
 
-void WindowInput::onDoubleClick(const int& x, const int& y)
+void WindowMain::onDoubleClick(const int& x, const int& y)
 {
 
 }
 
-void WindowInput::onMouseUp(const int& x, const int& y)
+void WindowMain::onMouseUp(const int& x, const int& y)
 {
 	if (selectEndLine == -1 || selectEndWord == -1 ||(selectStartLine == selectEndLine && selectStartWord == selectEndWord)) {
 		cancelSelection();
 	}
 }
 
-void WindowInput::onMouseDrag(const int& x, const int& y)
+void WindowMain::onMouseDrag(const int& x, const int& y)
 {
 	auto lwIndex = setMouseAtIndex(x, y);
 	caretLineIndex = lwIndex.first;
@@ -36,15 +38,15 @@ void WindowInput::onMouseDrag(const int& x, const int& y)
 	activeKeyboard();
 }
 
-void WindowInput::onMouseMove(const int& x, const int& y)
+void WindowMain::onMouseMove(const int& x, const int& y)
 {
 }
 
-void WindowInput::onMouseDownRight(const int& x, const int& y)
+void WindowMain::onMouseDownRight(const int& x, const int& y)
 {
 }
 
-std::pair<float, float>  WindowInput::setMouseAtIndex(const int& x, const int& y) {
+std::pair<float, float>  WindowMain::setMouseAtIndex(const int& x, const int& y) {
 	std::pair<float, float> result;
 	auto height{ fontBottom - fontTop };
 	result.first = y / height;

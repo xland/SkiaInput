@@ -1,7 +1,54 @@
-#include "WindowInput.h"
+#include "WindowMain.h"
 
+void WindowMain::onKeyDown(const unsigned int& val)
+{
+    if (val == VK_UP) {
+        onKeyUp();
+    }
+    else if (val == VK_DOWN) {
+        onKeyDown();
+    }
+    else if (val == VK_LEFT) {
+        onKeyLeft();
+    }
+    else if (val == VK_RIGHT) {
+        onKeyRight();
+    }
+    else if (val == VK_RETURN) {
+        onKeyEnter();
+    }
+    else if (val == VK_BACK) {
+        onKeyBackspace();
+    }
+    else if (val == VK_DELETE) {
+        onKeyDelete();
+    }
+    else {
+        bool ctrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        if (ctrlPressed) {
+            if (val == 'C') {
+                onCopy();
+            }
+            else if (val == 'V') {
+                onPaste();
+            }
+            else if (val == 'X') {
+                onCut();
+            }
+            else if (val == 'A') {
+                onSelectAll();
+            }
+            else if (val == 'Z') {
+                //todo 
+            }
+            else if (val == 'Y') {
+                //todo
+            }
+        }
+    }
+}
 
-void WindowInput::onKeyLeft() {
+void WindowMain::onKeyLeft() {
     cancelSelection();
     caretWordIndex -= 1;
     if (caretWordIndex < 0) {
@@ -16,7 +63,7 @@ void WindowInput::onKeyLeft() {
     paintText();
     InvalidateRect(hwnd, nullptr, false);
 }
-void WindowInput::onKeyUp() {
+void WindowMain::onKeyUp() {
     cancelSelection();
     if (caretLineIndex <= 0) return;
     caretLineIndex -= 1;
@@ -27,7 +74,7 @@ void WindowInput::onKeyUp() {
     paintText();
     InvalidateRect(hwnd, nullptr, false);
 }
-void WindowInput::onKeyRight() {
+void WindowMain::onKeyRight() {
     cancelSelection();
     caretWordIndex += 1;
     if (caretWordIndex >= wordPos[caretLineIndex].size()) {
@@ -42,7 +89,7 @@ void WindowInput::onKeyRight() {
     InvalidateRect(hwnd, nullptr, false);
     activeKeyboard();
 }
-void WindowInput::onKeyDown() {
+void WindowMain::onKeyDown() {
     cancelSelection();
     if (caretLineIndex >= wordPos.size() - 1) return;
     caretLineIndex += 1;
@@ -54,7 +101,7 @@ void WindowInput::onKeyDown() {
     activeKeyboard();
 }
 
-void WindowInput::onCopy() {
+void WindowMain::onCopy() {
     if (!hasSelection()) {
         return;
     }
@@ -74,7 +121,7 @@ void WindowInput::onCopy() {
     str.pop_back();
     saveToClipboard(str);
 }
-void WindowInput::onPaste() {
+void WindowMain::onPaste() {
 	auto clipboardStr = getClipboardText();
     if (clipboardStr.empty())
     {
@@ -137,7 +184,7 @@ void WindowInput::onPaste() {
     activeKeyboard();
 
 }
-void WindowInput::onSelectAll() {
+void WindowMain::onSelectAll() {
     if (lines.size() == 0) {
         return;
     }
@@ -149,7 +196,7 @@ void WindowInput::onSelectAll() {
     InvalidateRect(hwnd, nullptr, false);
     activeKeyboard();
 }
-void WindowInput::onCut() {
+void WindowMain::onCut() {
     if (!hasSelection()) {
         return;
     }
@@ -194,7 +241,7 @@ void WindowInput::onCut() {
     activeKeyboard();
 }
 
-void WindowInput::onKeyEnter()
+void WindowMain::onKeyEnter()
 {
     if (hasSelection()) {
         deleteSelection();
@@ -215,7 +262,7 @@ void WindowInput::onKeyEnter()
     InvalidateRect(hwnd, nullptr, false);
     activeKeyboard();
 }
-void WindowInput::onKeyDelete() {
+void WindowMain::onKeyDelete() {
     if (hasSelection()) {
 		deleteSelection();
         return;
@@ -245,7 +292,7 @@ void WindowInput::onKeyDelete() {
     InvalidateRect(hwnd, nullptr, false);
     activeKeyboard();
 }
-void WindowInput::onKeyBackspace()
+void WindowMain::onKeyBackspace()
 {
     if (hasSelection()) {
         deleteSelection();
@@ -286,7 +333,7 @@ void WindowInput::onKeyBackspace()
     activeKeyboard();
 }
 
-void WindowInput::onChar(const unsigned int& val)
+void WindowMain::onChar(const unsigned int& val)
 {
     if (hasSelection()) {
         deleteSelection();

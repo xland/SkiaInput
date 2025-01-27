@@ -1,9 +1,9 @@
-#include "WindowInput.h"
+#include "WindowMain.h"
 
 
-void WindowInput::flashCaret()
+void WindowMain::flashCaret()
 {
-    auto color = caretVisible ? 0xFF00FFFF : 0xFF345678;
+    auto color = caretVisible ? colorFore : colorBg;
     SkPoint p;
     if (caretLineIndex == 0 && caretWordIndex == 0) {
         p = SkPoint(12, 0 - fontTop + fontDesent);
@@ -14,7 +14,7 @@ void WindowInput::flashCaret()
     auto height{ fontBottom - fontTop };
     SkPoint start = SkPoint(p.fX, p.fY + fontTop + caretLineIndex * height);// 字符顶部相对于基线的偏移  neagtive
     SkPoint end = SkPoint(p.fX, p.fY + fontBottom + caretLineIndex * height); // 字符底部相对于基线的偏移
-    auto canvas = surface->getCanvas();
+    auto canvas = ctx->getCanvas();
     SkPaint paint;
     paint.setColor(color);
     paint.setStroke(true);
@@ -22,7 +22,7 @@ void WindowInput::flashCaret()
     canvas->drawLine(start, end, paint);
     caretVisible = !caretVisible;
 }
-void WindowInput::paintSelectedBg(SkCanvas* canvas) {
+void WindowMain::paintSelectedBg(SkCanvas* canvas) {
     if (selectStartLine == -1 || selectStartWord == -1 || selectEndLine == -1 || selectEndWord == -1) {
         return;
     }
@@ -32,7 +32,7 @@ void WindowInput::paintSelectedBg(SkCanvas* canvas) {
     auto [startLine, startWord, endLine, endWord ] = getSelectionArea();
     auto height{ fontBottom - fontTop };
     SkPaint paint;
-    paint.setColor(0X66FFFFFF);
+    paint.setColor(0X66000000);
     for (size_t i = startLine; i <= endLine; i++)
     {
         float l, t, r, b;
@@ -60,26 +60,13 @@ void WindowInput::paintSelectedBg(SkCanvas* canvas) {
     }
 }
 
-void WindowInput::paint()
-{
-    if (w <= 0 || h <= 0) return;
-    SkPixmap pix;
-    surface->peekPixels(&pix);
-    PAINTSTRUCT ps;
-    auto dc = BeginPaint(hwnd, &ps);
-    BITMAPINFO bmi = { sizeof(BITMAPINFOHEADER), w, 0 - h, 1, 32, BI_RGB, h * 4 * w, 0, 0, 0, 0 };
-    SetDIBitsToDevice(dc, 0, 0, w, h, 0, 0, 0, h, pix.addr(), &bmi, DIB_RGB_COLORS);
-    ReleaseDC(hwnd, dc);
-    EndPaint(hwnd, &ps);
-}
-
-void WindowInput::paintLine(const std::wstring& text, const int& lineIndex, SkCanvas* canvas)
+void WindowMain::paintLine(const std::wstring& text, const int& lineIndex, SkCanvas* canvas)
 {
     wordPos.insert({ lineIndex,std::vector<SkPoint>() });
     SkPaint paint;
-    paint.setColor(0xFF00FFFF);
+    paint.setColor(colorFore);
     paint.setStroke(false);
-
+    paint.setAntiAlias(true);
     auto length = text.size() * sizeof(wchar_t);
     std::vector<SkGlyphID> glyphs(text.size());
     int glyphCount = font.textToGlyphs(text.data(), length, SkTextEncoding::kUTF16, glyphs.data(), text.size());
@@ -95,10 +82,11 @@ void WindowInput::paintLine(const std::wstring& text, const int& lineIndex, SkCa
     wordPos[lineIndex].push_back(SkPoint::Make(x, height));
     canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos[lineIndex].data(), SkPoint(0, lineIndex * height), font, paint);
 }
-void WindowInput::paintText()
+void WindowMain::paintText()
 {
-    SkCanvas* canvas = surface->getCanvas();
-    canvas->clear(0xFF345678);
+    SkCanvas* canvas = ctx->getCanvas();
+    
+    canvas->clear(colorBg);
     paintSelectedBg(canvas);
     wordPos.clear();
     int lineIndex{ 0 };
