@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-set(PROJECT_NAME "GPUSurface")
+set(PROJECT_NAME "SkiaInput")
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)

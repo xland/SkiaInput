@@ -28,6 +28,7 @@ skia_enable_skparagraph = true
 skia_enable_skshaper = true
 
 ```
+ninja -C out/debug
 
 ```
 clang_win = "C:\Program Files\LLVM"
@@ -58,3 +59,4 @@ skia_enable_gpu = true
 skia_enable_skparagraph = true
 skia_enable_skshaper = true
 ```
+ninja -C out/release
