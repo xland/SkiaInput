@@ -1,13 +1,13 @@
 #include <Windows.h>
 #include <string>
-//#include "MainWindow.h"
+#include "WindowMain.h"
 
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int nCmdShow)
 {
-    //MainWindow mainWin;
-    //mainWin.show();
+    WindowMain win;
+    win.show();
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {

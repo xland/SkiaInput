@@ -102,6 +102,11 @@ void OpenGL::init()
     wglMakeCurrent(hdc, hglrc);
     ReleaseDC(win->hwnd, hdc);
 
+    // 关闭 VSYNC ，否则会由于帧率的抖动导致平均帧率降低。
+    // VSYNC 会阻塞 SkSurface::flush，从而使每帧的耗时接近16.6ms,帧率最多60fps
+    //eglSwapInterval(display_, 0);
+    //eglSwapBuffers(display_, surface_);
+
     fBackendContext = GrGLMakeNativeInterface();
     m_grContext = GrDirectContexts::MakeGL(fBackendContext);
 
