@@ -76,6 +76,7 @@ void OpenGL::init()
     pfd.iPixelType = PFD_TYPE_RGBA;
     pfd.cColorBits = 32;
     pfd.cDepthBits = 24;
+    pfd.cAlphaBits = 8;
     pfd.iLayerType = PFD_MAIN_PLANE;
     int pixelFormat = ChoosePixelFormat(hdc, &pfd);
     SetPixelFormat(hdc, pixelFormat, &pfd);

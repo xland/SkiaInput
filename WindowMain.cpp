@@ -16,7 +16,7 @@ WindowMain::~WindowMain()
 
 void WindowMain::onPaint(SkCanvas* canvas)
 {
-    canvas->clear(0x22FFFFFF);
+    canvas->clear(0x22FF66FF);
     SkPaint paint;
     paint.setColor(SK_ColorRED);
     SkRect rect = SkRect::MakeXYWH(w - 150, h - 150, 140, 140);
