@@ -9,6 +9,7 @@
 #include <windowsx.h>
 #include <dwmapi.h>
 #include <versionhelpers.h>
+#include "backends/Backend.h"
 
 class WindowBase
 {
@@ -40,5 +41,6 @@ private:
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam);
 private:
+	std::unique_ptr<Backend> backend;
 };
 

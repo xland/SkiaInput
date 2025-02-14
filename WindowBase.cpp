@@ -29,7 +29,7 @@ void WindowBase::initWindow()
     //必须是WS_POPUP，不能是WS_OVERLAPPEDWINDOW，不然渲染会出问题
     hwnd = CreateWindowEx(NULL, clsName, clsName, WS_POPUP, x, y, w, h, nullptr, nullptr, hinstance, nullptr);
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
-
+    backend = Backend::create(this);
 }
 bool WindowBase::initAlpha()
 {

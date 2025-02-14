@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include <include/gpu/ganesh/gl/GrGLInterface.h>
 #include <include/gpu/ganesh/GrDirectContext.h>
-#include "Context.h"
+#include "Backend.h"
 
 class WindowBase;
-class OpenGL:public Context
+class OpenGL:public Backend
 {
 public:
 	OpenGL(WindowBase* win);

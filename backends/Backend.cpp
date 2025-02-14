@@ -1,18 +1,18 @@
 #include <iostream>
 
-#include "Context.h"
+#include "Backend.h"
 #include "OpenGL.h"
 #include "Raster.h"
 
-Context::Context(WindowBase* win) :win{win}
+Backend::Backend(WindowBase* win) :win{win}
 {
 }
 
-Context::~Context()
+Backend::~Backend()
 {
 }
 
-std::unique_ptr<Context> Context::create(WindowBase* win)
+std::unique_ptr<Backend> Backend::create(WindowBase* win)
 {
     if (isGPUAvailable()) {
         return std::make_unique<OpenGL>(win);
@@ -22,12 +22,12 @@ std::unique_ptr<Context> Context::create(WindowBase* win)
     }	
 }
 
-SkCanvas* Context::getCanvas()
+SkCanvas* Backend::getCanvas()
 {
 	auto surface = getSurface();
 	return surface->getCanvas();
 }
 
-bool Context::isGPUAvailable() {
+bool Backend::isGPUAvailable() {
     return true;
 }

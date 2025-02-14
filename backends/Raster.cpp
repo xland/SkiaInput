@@ -1,7 +1,7 @@
 #include "Raster.h"
 #include "../WindowBase.h"
 
-Raster::Raster(WindowBase* win):Context(win)
+Raster::Raster(WindowBase* win):Backend(win)
 {
     backendType = "Raster";
 }

@@ -6,11 +6,11 @@
 #include <include/core/SkColorSpace.h>
 
 class WindowBase;
-class Context
+class Backend
 {
 public:
-	~Context();
-	static std::unique_ptr<Context> create(WindowBase* win);
+	~Backend();
+	static std::unique_ptr<Backend> create(WindowBase* win);
 	virtual void resize() = 0;
 	virtual sk_sp<SkSurface> getSurface() = 0;
 	SkCanvas* getCanvas();
@@ -19,7 +19,7 @@ public:
 public:
 	std::string backendType;
 protected:
-	Context(WindowBase* win);
+	Backend(WindowBase* win);
 protected:
 	WindowBase* win;
 	sk_sp<SkSurface> surface;

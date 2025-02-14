@@ -30,9 +30,7 @@ namespace {
     PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
 }
 
-
-
-OpenGL::OpenGL(WindowBase* win) : Context(win), fSurfaceProps(0, kRGB_H_SkPixelGeometry)
+OpenGL::OpenGL(WindowBase* win) : Backend(win), fSurfaceProps(0, kRGB_H_SkPixelGeometry)
 {
     backendType = "OpenGL";
     init();
