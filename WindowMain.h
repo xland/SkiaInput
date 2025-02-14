@@ -8,6 +8,7 @@ public:
 	WindowMain();
 	~WindowMain();
 protected:
+	void onPaint(SkCanvas* canvas) override;
 	void onShown() override;
 	void onSize() override;
 	void onKeyDown(const uint32_t& key) override;

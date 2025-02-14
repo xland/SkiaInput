@@ -9,6 +9,8 @@
 #include <windowsx.h>
 #include <dwmapi.h>
 #include <versionhelpers.h>
+#include <include/core/SkPaint.h>
+#include <include/core/SkCanvas.h>
 #include "backends/Backend.h"
 
 class WindowBase
@@ -28,7 +30,7 @@ protected:
 	virtual void onShown() {};
 	virtual void onSize() {};
 	virtual void onMove() {};
-	virtual void onPaint() {};
+	virtual void onPaint(SkCanvas* canvas) {};
 	virtual void onMousePress(const int& x, const int& y) {};
 	virtual void onMousePressRight(const int& x, const int& y) {};
 	virtual void onMouseDBClick(const int& x, const int& y) {};

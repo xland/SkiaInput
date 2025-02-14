@@ -27,7 +27,7 @@ void WindowBase::initWindow()
         isClsReg = true;
     }
     //必须是WS_POPUP，不能是WS_OVERLAPPEDWINDOW，不然渲染会出问题
-    hwnd = CreateWindowEx(NULL, clsName, clsName, WS_POPUP, x, y, w, h, nullptr, nullptr, hinstance, nullptr);
+    hwnd = CreateWindowEx(NULL, clsName, clsName, WS_OVERLAPPEDWINDOW, x, y, w, h, nullptr, nullptr, hinstance, nullptr);
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
     backend = Backend::create(this);
 }
@@ -78,15 +78,15 @@ LRESULT WindowBase::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     }
     switch (msg)
     {
-    case WM_NCCALCSIZE:
-    {
-        if (wParam == TRUE) {
-            NCCALCSIZE_PARAMS* pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lParam);
-            pncsp->rgrc[0] = pncsp->rgrc[1]; //窗口客户区覆盖整个窗口
-            return 0; //确认改变窗口客户区
-        }
-        return DefWindowProc(hWnd, msg, wParam, lParam);
-    }
+    //case WM_NCCALCSIZE:
+    //{
+    //    if (wParam == TRUE) {
+    //        NCCALCSIZE_PARAMS* pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lParam);
+    //        pncsp->rgrc[0] = pncsp->rgrc[1]; //窗口客户区覆盖整个窗口
+    //        return 0; //确认改变窗口客户区
+    //    }
+    //    return DefWindowProc(hWnd, msg, wParam, lParam);
+    //}
     case WM_ERASEBKGND:
     {
         return TRUE;
@@ -122,13 +122,15 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         //todo minimize
         w = LOWORD(lParam);
         h = HIWORD(lParam);
+        backend->resize();
         onSize();
         return 0;
     }
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
-        onPaint();
+        onPaint(backend->getCanvas());
+        backend->paint(hdc);
         ReleaseDC(hwnd, hdc);
         EndPaint(hwnd, &ps);
         return 0;

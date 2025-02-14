@@ -1,5 +1,6 @@
 ﻿#include "WindowMain.h"
 
+
 WindowMain::WindowMain()
 {
     initPosSize();
@@ -11,6 +12,14 @@ WindowMain::WindowMain()
 
 WindowMain::~WindowMain()
 {
+}
+
+void WindowMain::onPaint(SkCanvas* canvas)
+{
+    SkPaint paint;
+    paint.setColor(SK_ColorRED);
+    SkRect rect = SkRect::MakeXYWH(w - 150, h - 150, 140, 140);
+    canvas->drawRect(rect, paint);
 }
 
 void WindowMain::onShown()

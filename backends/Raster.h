@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Context.h"
+#include "Backend.h"
 
 class WindowBase;
-class Raster:public Context
+class Raster:public Backend
 {
 public:
 	Raster(WindowBase* win);
