@@ -21,10 +21,33 @@
     <ClCompile Include="WindowBase.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="backends\Context.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="backends\OpenGL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="backends\Raster.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="backends\Raster.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="backends\Context.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="backends\OpenGL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+    <None Include="LICENSE" />
+    <None Include=".gitignore" />
   </ItemGroup>
 </Project>

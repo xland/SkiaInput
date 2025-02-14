@@ -1,5 +1,14 @@
-#pragma once
+﻿#pragma once
+#include <vector>
+#include <string>
+#include <memory>
+#include <map>
+#include <array>
+#include <thread>
 #include <Windows.h>
+#include <windowsx.h>
+#include <dwmapi.h>
+#include <versionhelpers.h>
 
 class WindowBase
 {
@@ -12,17 +21,24 @@ public:
 	HWND hwnd;
 protected:
 	void initWindow();
-	virtual void paint() {};
-	virtual void mousePress(const int& x, const int& y) {};
-	virtual void mousePressRight(const int& x, const int& y) {};
-	virtual void mouseDBClick(const int& x, const int& y) {};
-	virtual void mouseMove(const int& x, const int& y) {};
-	virtual void mouseDrag(const int& x, const int& y) {};
-	virtual void mouseRelease(const int& x, const int& y) {};
+	void initContext();
+	bool initAlpha();
+	void activeKeyboard(const int& x, const int& y);
+	virtual void onShown() {};
+	virtual void onSize() {};
+	virtual void onMove() {};
+	virtual void onPaint() {};
+	virtual void onMousePress(const int& x, const int& y) {};
+	virtual void onMousePressRight(const int& x, const int& y) {};
+	virtual void onMouseDBClick(const int& x, const int& y) {};
+	virtual void onMouseMove(const int& x, const int& y) {};
+	virtual void onMouseDrag(const int& x, const int& y) {};
+	virtual void onMouseRelease(const int& x, const int& y) {};
+	virtual void onKeyDown(const uint32_t& key) {};
+	virtual void onKeyDownWithCtrl(const uint32_t& key) {};
 private:
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam);
 private:
-
 };
 
