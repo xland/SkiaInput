@@ -148,12 +148,18 @@
     <ClCompile Include="backends\Raster.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="WindowBase.cpp" />
+    <ClCompile Include="WindowMain.cpp" />
+    <ClCompile Include="WindowMainKey.cpp" />
+    <ClCompile Include="WindowMainMouse.cpp" />
+    <ClCompile Include="WindowMainPaint.cpp" />
+    <ClCompile Include="WindowMainUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\Context.h" />
     <ClInclude Include="backends\OpenGL.h" />
     <ClInclude Include="backends\Raster.h" />
     <ClInclude Include="WindowBase.h" />
+    <ClInclude Include="WindowMain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

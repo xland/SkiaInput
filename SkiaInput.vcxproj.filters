@@ -30,6 +30,21 @@
     <ClCompile Include="backends\Raster.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="WindowMain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowMainUtil.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowMainKey.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowMainMouse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowMainPaint.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowBase.h">
@@ -42,6 +57,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="backends\OpenGL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowMain.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
