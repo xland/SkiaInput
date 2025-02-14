@@ -21,7 +21,7 @@ void WinBase::createWindow()
     auto hinstance = GetModuleHandle(NULL);
     if (!isClsReg) {
         wcex.cbSize = sizeof(WNDCLASSEX);
-        wcex.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+        wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_OWNDC | CS_BYTEALIGNCLIENT;
         wcex.lpfnWndProc = &WinBase::wndProc;
         wcex.cbClsExtra = 0;
         wcex.cbWndExtra = 0;
@@ -81,7 +81,7 @@ LRESULT WinBase::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     //case WM_IME_ENDCOMPOSITION:
     //{
     //    HIMC himc = ImmGetContext(hWnd);
-    //    ImmNotifyIME(himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0); // Çå¿ÕÊäÈëÄÚÈÝ
+    //    ImmNotifyIME(himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0); // æ¸…ç©ºè¾“å…¥å†…å®¹
     //    ImmReleaseContext(hWnd, himc);
     //    return 0;
     //}

@@ -8,6 +8,7 @@
 
 #include "Context.h"
 #include "OpenGL.h"
+#include "OpenGL2.h"
 #include "Raster.h"
 
 using Microsoft::WRL::ComPtr;
@@ -23,7 +24,7 @@ Context::~Context()
 std::unique_ptr<Context> Context::create(WinBase* win)
 {
     if (isGPUAvailable()) {
-        return std::make_unique<OpenGL>(win);
+        return std::make_unique<OpenGL2>(win);
     }
     else {
         return std::make_unique<Raster>(win);

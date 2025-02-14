@@ -21,7 +21,7 @@ WindowMain::~WindowMain()
 void WindowMain::onShown()
 {
     paintText();
-    SetTimer(hwnd, 1001, 600, NULL);
+    //SetTimer(hwnd, 1001, 600, NULL);
     activeKeyboard();
 }
 

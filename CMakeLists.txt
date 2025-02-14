@@ -14,6 +14,7 @@ target_sources(${PROJECT_NAME} PRIVATE
  "WindowMain.h" "WindowMain.cpp" "WindowMainUtil.cpp" "WindowMainPaint.cpp" "WindowMainMouse.cpp" "WindowMainKey.cpp"
  "WinBase.h" "WinBase.cpp" 
  "backends/OpenGL.h" "backends/OpenGL.cpp"
+ "backends/OpenGL2.h" "backends/OpenGL2.cpp"
  "backends/Raster.h" "backends/Raster.cpp" 
  "backends/Context.h" "backends/Context.cpp"
  "backends/SkWGL.h" "backends/SkWGL.cpp"

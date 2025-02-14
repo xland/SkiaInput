@@ -46,8 +46,7 @@ BOOL SkWGLExtensions::choosePixelFormat(HDC hdc,
                                         UINT nMaxFormats,
                                         int* piFormats,
                                         UINT* nNumFormats) const {
-    return fChoosePixelFormat(hdc, piAttribIList, pfAttribFList,
-                              nMaxFormats, piFormats, nNumFormats);
+    return fChoosePixelFormat(hdc, piAttribIList, pfAttribFList, nMaxFormats, piFormats, nNumFormats);
 }
 
 BOOL SkWGLExtensions::getPixelFormatAttribiv(HDC hdc,
@@ -56,8 +55,7 @@ BOOL SkWGLExtensions::getPixelFormatAttribiv(HDC hdc,
                                              UINT nAttributes,
                                              const int *piAttributes,
                                              int *piValues) const {
-    return fGetPixelFormatAttribiv(hdc, iPixelFormat, iLayerPlane,
-                                   nAttributes, piAttributes, piValues);
+    return fGetPixelFormatAttribiv(hdc, iPixelFormat, iLayerPlane, nAttributes, piAttributes, piValues);
 }
 
 BOOL SkWGLExtensions::getPixelFormatAttribfv(HDC hdc,
@@ -66,8 +64,7 @@ BOOL SkWGLExtensions::getPixelFormatAttribfv(HDC hdc,
                                              UINT nAttributes,
                                              const int *piAttributes,
                                              float *pfValues) const {
-    return fGetPixelFormatAttribfv(hdc, iPixelFormat, iLayerPlane,
-                                   nAttributes, piAttributes, pfValues);
+    return fGetPixelFormatAttribfv(hdc, iPixelFormat, iLayerPlane, nAttributes, piAttributes, pfValues);
 }
 HGLRC SkWGLExtensions::createContextAttribs(HDC hDC,
                                             HGLRC hShareContext,

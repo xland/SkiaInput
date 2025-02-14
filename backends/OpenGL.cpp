@@ -41,8 +41,8 @@ sk_sp<SkSurface> OpenGL::getSurface()
 {
     if (nullptr == surface) {
         GrGLint buffer;
-        // ÕâÒ»¾ä·Ç³£ÖØÒª
-        // Ô­´úÂëÎª£ºGR_GL_CALL(fBackendContext.get(), GetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer));
+        // è¿™ä¸€å¥éžå¸¸é‡è¦
+        // åŽŸä»£ç ä¸ºï¼šGR_GL_CALL(fBackendContext.get(), GetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer));
         fBackendContext.get()->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
         GrGLFramebufferInfo fbInfo;
         fbInfo.fFBOID = buffer;
@@ -51,8 +51,7 @@ sk_sp<SkSurface> OpenGL::getSurface()
         auto backendRT = GrBackendRenderTargets::MakeGL(win->w, win->h,
             fSampleCount,
             fStencilBits,
-            fbInfo);
-
+            fbInfo);        
         surface = SkSurfaces::WrapBackendRenderTarget(fContext.get(),
             backendRT,
             kBottomLeft_GrSurfaceOrigin,

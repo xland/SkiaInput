@@ -4,25 +4,24 @@
 #include "Context.h"
 
 class WinBase;
-class OpenGL:public Context
+class OpenGL2:public Context
 {
 public:
-	OpenGL(WinBase* win);
-	~OpenGL();
+	OpenGL2(WinBase* win);
+	~OpenGL2();
 	void resize() override;
 	sk_sp<SkSurface> getSurface() override;
 	void paint(HDC dc) override;
 	void textureFromImage(sk_sp<SkImage>& image) override;
 private:
 	void init();
-	void destroyContext();
 private:
-	HGLRC fHGLRC{nullptr};
+	HGLRC hglrc;
+	sk_sp<GrDirectContext> m_grContext;
+	sk_sp<const GrGLInterface> fBackendContext;
 	int fStencilBits = 0;
 	int fSampleCount = 3;
-	sk_sp<const GrGLInterface> fBackendContext;
-	sk_sp<GrDirectContext> fContext;
-	GrContextOptions fGrContextOptions;
 	SkSurfaceProps fSurfaceProps;
+	GrGLFramebufferInfo fbInfo;
 };
 

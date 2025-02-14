@@ -1,3 +1,7 @@
+bin/gn gen out/debug --args='clang_win=\"C:\Program Files\LLVM\" cc=\"clang\" cxx=\"clang++\" extra_cflags=[\"/MTd\", \"-std=c++17\"] is_official_build=true is_debug=false'
+
+
+
 ```
 clang_win = "C:\Program Files\LLVM"
 cc = "clang"
@@ -18,11 +22,11 @@ skia_use_webgpu = false
 skia_use_angle = false
 skia_use_metal = false
 skia_use_ffmpeg = false
-skia_use_dawn = true
+skia_use_dawn = false
 skia_use_gl = true   
 skia_enable_tools = false
 skia_enable_ganesh = true
-skia_enable_graphite = true
+skia_enable_graphite = false
 skia_enable_gpu = true
 skia_enable_skparagraph = true
 skia_enable_skshaper = true
@@ -54,7 +58,7 @@ skia_use_dawn = true
 skia_use_gl = true   
 skia_enable_tools = false
 skia_enable_ganesh = true
-skia_enable_graphite = true
+skia_enable_graphite = false
 skia_enable_gpu = true
 skia_enable_skparagraph = true
 skia_enable_skshaper = true
