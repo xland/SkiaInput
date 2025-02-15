@@ -57,8 +57,6 @@ void OpenGL::resize()
     m_grContext->purgeUnlockedResources(GrPurgeResourceOptions::kAllResources);
     m_grContext.reset();
     fBackendContext.reset();
-
-
     fBackendContext = GrGLMakeNativeInterface();
     m_grContext = GrDirectContexts::MakeGL(fBackendContext);
     if (!m_grContext) {
