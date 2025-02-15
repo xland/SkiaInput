@@ -25,9 +25,15 @@ namespace {
     #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
     #define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
     #define WGL_CONTEXT_PROFILE_MASK_ARB  0x9126
+    //#define WGL_CONTEXT_FLAGS_ARB 0x2094
+    //#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x00000002
     #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001 
     typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int* attribList);
     PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
+    extern "C" {
+        __declspec(dllexport) int NvOptimusEnablement = 1;
+        __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+    }
 }
 
 OpenGL::OpenGL(WindowBase* win) : Backend(win), fSurfaceProps(0, kRGB_H_SkPixelGeometry)
@@ -47,6 +53,23 @@ OpenGL::~OpenGL()
 void OpenGL::resize()
 {
     surface.reset(nullptr);
+    m_grContext->flushAndSubmit();
+    m_grContext->purgeUnlockedResources(GrPurgeResourceOptions::kAllResources);
+    m_grContext.reset();
+    fBackendContext.reset();
+
+
+    fBackendContext = GrGLMakeNativeInterface();
+    m_grContext = GrDirectContexts::MakeGL(fBackendContext);
+    if (!m_grContext) {
+        SkDebugf("Failed to re-create GrDirectContext in resize()\n");
+        return;
+    }
+    GrGLint buffer;
+    fBackendContext->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
+    fbInfo.fFBOID = buffer;
+    fbInfo.fFormat = GR_GL_RGBA8;
+    fbInfo.fProtected = skgpu::Protected(false);
 }
 
 sk_sp<SkSurface> OpenGL::getSurface()
@@ -79,14 +102,22 @@ void OpenGL::init()
     pfd.cAlphaBits = 8;
     pfd.iLayerType = PFD_MAIN_PLANE;
     int pixelFormat = ChoosePixelFormat(hdc, &pfd);
-    SetPixelFormat(hdc, pixelFormat, &pfd);
+    auto flag = SetPixelFormat(hdc, pixelFormat, &pfd);
     HGLRC oldContext = wglCreateContext(hdc);
     wglMakeCurrent(hdc, oldContext);
     wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+    //int attribs[] = {
+    //    WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+    //    WGL_CONTEXT_MINOR_VERSION_ARB, 2,
+    //    WGL_CONTEXT_FLAGS_ARB,
+    //    WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+    //    0
+    //};
     int attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, 
+        WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
         0
     };
     HGLRC newContext = wglCreateContextAttribsARB(hdc, 0, attribs);
@@ -113,7 +144,6 @@ void OpenGL::init()
     // 这一句非常重要
     // 原代码为：GR_GL_CALL(fBackendContext.get(), GetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer));
     fBackendContext.get()->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
-    
     fbInfo.fFBOID = buffer;
     fbInfo.fFormat = GR_GL_RGBA8;
     fbInfo.fProtected = skgpu::Protected(false);
