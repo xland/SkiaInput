@@ -25,8 +25,6 @@ namespace {
     #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
     #define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
     #define WGL_CONTEXT_PROFILE_MASK_ARB  0x9126
-    //#define WGL_CONTEXT_FLAGS_ARB 0x2094
-    //#define WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB 0x00000002
     #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001 
     typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC hDC, HGLRC hShareContext, const int* attribList);
     PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
@@ -52,22 +50,18 @@ OpenGL::~OpenGL()
 
 void OpenGL::resize()
 {
+    //todo:特殊场景内存泄漏！！！
+    // 有两个屏幕时如果A屏幕设置为主屏的时候，改变窗口大小无内存泄漏，
+    // B屏幕设置为主屏幕时，改变窗口大小则可能导致内存泄漏。
     surface.reset(nullptr);
-    m_grContext->flushAndSubmit();
-    m_grContext->purgeUnlockedResources(GrPurgeResourceOptions::kAllResources);
-    m_grContext.reset();
-    fBackendContext.reset();
-    fBackendContext = GrGLMakeNativeInterface();
-    m_grContext = GrDirectContexts::MakeGL(fBackendContext);
-    if (!m_grContext) {
-        SkDebugf("Failed to re-create GrDirectContext in resize()\n");
-        return;
+    if (m_grContext) {
+        //m_grContext->flushAndSubmit();
+        //m_grContext->purgeUnlockedResources(GrPurgeResourceOptions::kAllResources);
+        m_grContext->abandonContext();
+        m_grContext.reset(nullptr);
     }
-    GrGLint buffer;
-    fBackendContext->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
-    fbInfo.fFBOID = buffer;
-    fbInfo.fFormat = GR_GL_RGBA8;
-    fbInfo.fProtected = skgpu::Protected(false);
+    m_grContext.reset(nullptr);
+    m_grContext = GrDirectContexts::MakeGL(fBackendContext);
 }
 
 sk_sp<SkSurface> OpenGL::getSurface()
@@ -104,13 +98,6 @@ void OpenGL::init()
     HGLRC oldContext = wglCreateContext(hdc);
     wglMakeCurrent(hdc, oldContext);
     wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
-    //int attribs[] = {
-    //    WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-    //    WGL_CONTEXT_MINOR_VERSION_ARB, 2,
-    //    WGL_CONTEXT_FLAGS_ARB,
-    //    WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-    //    0
-    //};
     int attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
@@ -134,13 +121,8 @@ void OpenGL::init()
     // VSYNC 会阻塞 SkSurface::flush，从而使每帧的耗时接近16.6ms,帧率最多60fps
     //eglSwapInterval(display_, 0);
     //eglSwapBuffers(display_, surface_);
-
     fBackendContext = GrGLMakeNativeInterface();
-    m_grContext = GrDirectContexts::MakeGL(fBackendContext);
-
     GrGLint buffer;
-    // 这一句非常重要
-    // 原代码为：GR_GL_CALL(fBackendContext.get(), GetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer));
     fBackendContext.get()->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
     fbInfo.fFBOID = buffer;
     fbInfo.fFormat = GR_GL_RGBA8;
