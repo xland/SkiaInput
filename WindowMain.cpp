@@ -1,4 +1,5 @@
-﻿#include "WindowMain.h"
+﻿#include <sstream>
+#include "WindowMain.h"
 
 
 WindowMain::WindowMain()
@@ -7,7 +8,6 @@ WindowMain::WindowMain()
     initWindow();
     initAlpha();
     initFont();
-    paintText();
 }
 
 WindowMain::~WindowMain()
@@ -17,10 +17,30 @@ WindowMain::~WindowMain()
 void WindowMain::onPaint(SkCanvas* canvas)
 {
     canvas->clear(0x22FF66FF);
+    std::wstringstream ss(text);
     SkPaint paint;
-    paint.setColor(SK_ColorRED);
-    SkRect rect = SkRect::MakeXYWH(w - 150, h - 150, 140, 140);
-    canvas->drawRect(rect, paint);
+    paint.setColor(SK_ColorBLACK);
+    paint.setAntiAlias(true);
+
+    std::wstring line;
+    int lineIndex{ 0 };
+    while (std::getline(ss, line)) {
+        auto length = line.size() * sizeof(wchar_t);
+        std::vector<SkGlyphID> glyphs(line.size());
+        int glyphCount = font.textToGlyphs(line.data(), length, SkTextEncoding::kUTF16, glyphs.data(), line.size());
+        std::vector<SkScalar> widths(glyphCount);
+        font.getWidthsBounds(glyphs.data(), glyphCount, widths.data(), nullptr, nullptr);
+        SkScalar x = 12;
+        float height{ fontBottom - fontTop };
+        std::vector<SkPoint> wordPos;
+        for (int i = 0; i < glyphCount; ++i) {
+            wordPos.push_back(SkPoint::Make(x, height));
+            x += widths[i]; // 累计宽度
+        }
+        wordPos.push_back(SkPoint::Make(x, height));
+        canvas->drawGlyphs(glyphCount, glyphs.data(), wordPos.data(), SkPoint(0, lineIndex * height+12.f), font, paint);
+        lineIndex += 1;
+    }
 }
 
 void WindowMain::onShown()
@@ -106,14 +126,17 @@ float WindowMain::getLineHeight()
 
 void WindowMain::initFont()
 {
-    //BLFontFace face;
-    ////BLResult err = face.createFromFile("C:\\Windows\\Fonts\\msyhl.ttc");
-    //BLResult err = face.createFromFile("C:\\Windows\\Fonts\\simhei.ttf"); //黑体
-    //if (err) {
-    //    return;
-    //}
-    //font = std::make_unique<BLFont>();
-    //font->createFromFace(face, 26.0f);
+    auto fontMgr = SkFontMgr_New_GDI();
+    auto typeFace = fontMgr->matchFamilyStyle("Microsoft YaHei Light", SkFontStyle());
+    font = SkFont(typeFace, fontSize);
+    font.setEdging(SkFont::Edging::kSubpixelAntiAlias);
+    font.setSubpixel(true);
+    SkFontMetrics metrics;
+    font.getMetrics(&metrics);
+    fontTop = metrics.fTop;
+    fontBottom = metrics.fBottom;
+    fontAsent = metrics.fAscent;
+    fontDesent = metrics.fDescent;
 }
 
 

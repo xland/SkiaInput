@@ -33,6 +33,8 @@ private:
 	std::string convertToUTF8(const std::wstring& wstr);
 	std::string convertToUTF8(const LPWSTR& wstr);
 private:
+	SkFont font;
+	float fontTop, fontBottom, fontAsent, fontDesent;//fontAsent从基线到字体中最高字符顶部的距离,fTop 是从基线到字体中理论上最高点的距离。
 	std::wstring text{ LR"(破阵子 · 为陈同甫赋壮词以寄之
 辛弃疾 · 宋 · XinQiJi (1140年－1207年) 
 
@@ -44,6 +46,7 @@ private:
 	size_t caretIndex{ 7 };
 	float caretX, caretY;
 	bool caretVisible{ true };
-	float padding{ 18 }, lineSpan{16};
+	float padding{ 18 };
+	float fontSize{ 16 }, lineHeight{ 1.5 };
 	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 };
 };

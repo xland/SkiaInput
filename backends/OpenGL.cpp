@@ -34,7 +34,7 @@ namespace {
     }
 }
 
-OpenGL::OpenGL(WindowBase* win) : Backend(win), fSurfaceProps(0, kRGB_H_SkPixelGeometry)
+OpenGL::OpenGL(WindowBase* win) : Backend(win), surfaceProps(0, kRGB_H_SkPixelGeometry)
 {
     backendType = "OpenGL";
     init();
@@ -53,36 +53,41 @@ void OpenGL::resize()
     //todo:特殊场景内存泄漏！！！
     // 有两个屏幕时如果A屏幕设置为主屏的时候，改变窗口大小无内存泄漏，
     // B屏幕设置为主屏幕时，改变窗口大小则可能导致内存泄漏。
+    // imgui也有类似的问题
     surface.reset(nullptr);
-    if (m_grContext) {
+    if (grContext) {
         //m_grContext->flushAndSubmit();
         //m_grContext->purgeUnlockedResources(GrPurgeResourceOptions::kAllResources);
-        m_grContext->abandonContext();
-        m_grContext.reset(nullptr);
+        grContext->abandonContext();
+        grContext.reset(nullptr);
     }
-    m_grContext.reset(nullptr);
-    m_grContext = GrDirectContexts::MakeGL(fBackendContext);
+    grContext.reset(nullptr);
+    grContext = GrDirectContexts::MakeGL(backendContext);
 }
 
 sk_sp<SkSurface> OpenGL::getSurface()
 {
     if (nullptr == surface) {
         auto backendRT = GrBackendRenderTargets::MakeGL(win->w, win->h,
-            fSampleCount,
-            fStencilBits,
+            3, //sampleCount
+            0, //stencilBits
             fbInfo);
-        surface = SkSurfaces::WrapBackendRenderTarget(m_grContext.get(),
+        surface = SkSurfaces::WrapBackendRenderTarget(grContext.get(),
             backendRT,
             kBottomLeft_GrSurfaceOrigin,
             kRGBA_8888_SkColorType,
             nullptr,
-            &fSurfaceProps);
+            &surfaceProps);
     }
     return surface;
 }
 
 void OpenGL::init()
 {
+    // 关闭 VSYNC ，否则会由于帧率的抖动导致平均帧率降低。
+    // VSYNC 会阻塞 SkSurface::flush，从而使每帧的耗时接近16.6ms,帧率最多60fps
+    //eglSwapInterval(display_, 0);
+    //eglSwapBuffers(display_, surface_);
     HDC hdc = GetDC(win->hwnd);
     PIXELFORMATDESCRIPTOR pfd = {};
     pfd.nSize = sizeof(pfd);
@@ -101,10 +106,11 @@ void OpenGL::init()
     int attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_PROFILE_MASK_ARB, 
+        WGL_CONTEXT_PROFILE_MASK_ARB,
         WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
         0
     };
+    HGLRC hglrc;
     HGLRC newContext = wglCreateContextAttribsARB(hdc, 0, attribs);
     if (newContext) {
         wglMakeCurrent(nullptr, nullptr);
@@ -116,24 +122,19 @@ void OpenGL::init()
     }
     wglMakeCurrent(hdc, hglrc);
     ReleaseDC(win->hwnd, hdc);
-
-    // 关闭 VSYNC ，否则会由于帧率的抖动导致平均帧率降低。
-    // VSYNC 会阻塞 SkSurface::flush，从而使每帧的耗时接近16.6ms,帧率最多60fps
-    //eglSwapInterval(display_, 0);
-    //eglSwapBuffers(display_, surface_);
-    fBackendContext = GrGLMakeNativeInterface();
+    backendContext = GrGLMakeNativeInterface();
     GrGLint buffer;
-    fBackendContext.get()->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
+    backendContext.get()->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &buffer);
     fbInfo.fFBOID = buffer;
     fbInfo.fFormat = GR_GL_RGBA8;
     fbInfo.fProtected = skgpu::Protected(false);
 }
 
 void OpenGL::paint(HDC dc) {
-    m_grContext->flushAndSubmit(surface.get());
+    grContext->flushAndSubmit(surface.get());
     SwapBuffers(dc);
 }
 void OpenGL::textureFromImage(sk_sp<SkImage>& image)
 {
-    image = SkImages::TextureFromImage(m_grContext.get(), image.get());
+    image = SkImages::TextureFromImage(grContext.get(), image.get());
 }

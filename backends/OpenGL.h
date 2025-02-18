@@ -9,6 +9,7 @@ class OpenGL:public Backend
 public:
 	OpenGL(WindowBase* win);
 	~OpenGL();
+	static std::unique_ptr<Backend> create(WindowBase* win);
 	void resize() override;
 	sk_sp<SkSurface> getSurface() override;
 	void paint(HDC dc) override;
@@ -17,11 +18,9 @@ private:
 	void init();
 private:
 	HGLRC hglrc;
-	sk_sp<GrDirectContext> m_grContext;
-	sk_sp<const GrGLInterface> fBackendContext;
-	int fStencilBits = 0;
-	int fSampleCount = 3;
-	SkSurfaceProps fSurfaceProps;
+	sk_sp<GrDirectContext> grContext;
+	sk_sp<const GrGLInterface> backendContext;
+	SkSurfaceProps surfaceProps;
 	GrGLFramebufferInfo fbInfo;
 };
 

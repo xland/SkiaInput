@@ -71,33 +71,4 @@ void WindowMain::setCaretPos()
 
 void WindowMain::paintText()
 {
-    /*auto ctx = getCtx();
-    ctx->fillAll(BLRgba32(colorBg));
-    BLGlyphBuffer gb;
-    BLTextMetrics tm;
-    BLFontMetrics fm = font->metrics();
-    float x = padding, y = padding + fm.ascent;
-    std::wstring line;
-    for (wchar_t ch : text) {
-        if (ch == L'\n') {
-            gb.setWCharText(line.data());
-            font->shape(gb);
-            font->getTextMetrics(gb, tm);
-            ctx->fillGlyphRun(BLPoint(x, y), *font.get(), gb.glyphRun(), BLRgba32(colorFore));
-            line.clear();
-            y += getLineHeight();
-        }
-        else {
-            line += ch;
-        }
-    }
-    if (!line.empty()) {
-        gb.setWCharText(line.data());
-        font->shape(gb);
-        font->getTextMetrics(gb, tm);
-        ctx->fillGlyphRun(BLPoint(x, y), *font.get(), gb.glyphRun(), BLRgba32(colorFore));
-    }
-
-    setCaretPos();
-    flashCaret();*/
 }

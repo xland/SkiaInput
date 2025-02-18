@@ -9,8 +9,16 @@
 #include <windowsx.h>
 #include <dwmapi.h>
 #include <versionhelpers.h>
+#include <include/core/SkData.h>
 #include <include/core/SkPaint.h>
 #include <include/core/SkCanvas.h>
+#include <include/core/SkFont.h>
+#include <include/core/SkSurface.h>
+#include <include/core/SkFontMgr.h>
+#include <include/core/SkFontStyle.h>
+#include <include/ports/SkTypeface_win.h>
+#include <include/core/SkFontMetrics.h>
+
 #include "backends/Backend.h"
 
 class WindowBase

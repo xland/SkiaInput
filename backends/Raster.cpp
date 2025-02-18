@@ -10,6 +10,11 @@ Raster::~Raster()
 {
 }
 
+Raster* Raster::create(WindowBase* win)
+{
+    return nullptr;
+}
+
 void Raster::resize()
 {
     surface.reset(nullptr);
