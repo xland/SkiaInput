@@ -71,4 +71,5 @@ void WindowMain::setCaretPos()
 
 void WindowMain::paintText()
 {
+
 }

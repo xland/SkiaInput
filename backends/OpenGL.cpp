@@ -34,7 +34,7 @@ namespace {
     }
 }
 
-OpenGL::OpenGL(WindowBase* win) : Backend(win), surfaceProps(0, kRGB_H_SkPixelGeometry)
+OpenGL::OpenGL(WindowBase* win) : Backend(win), surfaceProps(SkSurfaceProps::kUseDeviceIndependentFonts_Flag, kRGB_H_SkPixelGeometry)
 {
     backendType = "OpenGL";
     init();
