@@ -8,6 +8,8 @@ class WindowMain:public WindowBase
 public:
 	WindowMain();
 	~WindowMain();
+public:
+	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 };
 protected:
 	void onPaint(SkCanvas* canvas) override;
 	void onShown() override;
@@ -20,6 +22,7 @@ protected:
 	void onMouseDrag(const int& x, const int& y) override;
 	void onMouseMove(const int& x, const int& y) override;
 	void onMousePressRight(const int& x, const int& y) override;
+	void onTimer(const uint32_t& key) override;
 private:
 	void initPosSize();
 	void paintText();
@@ -31,6 +34,6 @@ private:
 	std::string convertToUTF8(const std::wstring& wstr);
 	std::string convertToUTF8(const LPWSTR& wstr);
 private:	
-	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 };
 	GlyphBox glyphBox;
+	int paintState{ 0 };
 };

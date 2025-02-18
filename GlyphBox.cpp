@@ -1,4 +1,5 @@
 ﻿#include "GlyphBox.h"
+#include "WindowMain.h"
 
 GlyphBox::GlyphBox()
 {
@@ -8,8 +9,9 @@ GlyphBox::~GlyphBox()
 {
 }
 
-void GlyphBox::init()
+void GlyphBox::init(WindowMain* win)
 {
+    this->win = win;
     initFont();
     initInfo();
 }
@@ -25,19 +27,28 @@ void GlyphBox::paintText(SkCanvas* canvas)
 }
 void GlyphBox::paintCaret(SkCanvas* canvas)
 {
-    auto height = getLineHeight();
-    auto color = caretVisible ? 0xFF00FFFF : 0xFF345678;
-    auto x = infos[caretY].wordPos[caretX].fX;
-    auto y0 = infos[caretY].wordPos[caretX].fY;
-    auto y = infos[caretY].y;
-    SkPoint start = SkPoint(x, y0 + fontTop + y);  // 字符顶部相对于基线的偏移  neagtive
-    SkPoint end = SkPoint(x, y0 + fontBottom + y); // 字符底部相对于基线的偏移
     SkPaint paint;
+    paint.setBlendMode(SkBlendMode::kClear);
     paint.setColor(SK_ColorBLACK);
     paint.setStroke(true);
     paint.setStrokeWidth(1);
-    canvas->drawLine(start, end, paint);
+    auto height = getLineHeight();
+    auto pos = getInputPos();
+    SkPoint startPos(pos.fX, pos.fY - fontBottom + fontTop);
+    canvas->drawLine(startPos, pos, paint);
+    paint.setBlendMode(SkBlendMode::kSrcOver);
+    paint.setColor(caretVisible ? win->colorFore :win->colorBg);
+    paint.setStroke(true);
+    paint.setStrokeWidth(1);
+    canvas->drawLine(startPos, pos, paint);
     caretVisible = !caretVisible;
+}
+SkPoint GlyphBox::getInputPos()
+{
+    auto x = infos[caretY].wordPos[caretX].fX;
+    auto y0 = infos[caretY].wordPos[caretX].fY;
+    auto y = infos[caretY].y;
+    return SkPoint(x, y0 + fontBottom + y);
 }
 void GlyphBox::initFont()
 {

@@ -3,12 +3,7 @@
 
 void WindowMain::flashCaret()
 {
-    //auto color = caretVisible ? colorFore : colorBg; 
-    //auto ctx = getCtx();
-    //ctx->setStrokeStyle(BLRgba32(color));
-    //ctx->setStrokeWidth(1);
-    //ctx->strokeLine(caretX, caretY, caretX, caretY + getLineHeight());
-    //caretVisible = !caretVisible;
+
 }
 void WindowMain::setCaretPos()
 {

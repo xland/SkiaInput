@@ -74,6 +74,9 @@
     <ClInclude Include="GlyphBox.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="PaintState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

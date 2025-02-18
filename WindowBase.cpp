@@ -112,6 +112,10 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
+    case WM_TIMER: {
+        onTimer(wParam);
+        return 0;
+    }
     case WM_MOVE: {
         x = LOWORD(lParam);
         y = HIWORD(lParam);

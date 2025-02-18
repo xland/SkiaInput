@@ -162,6 +162,7 @@
     <ClInclude Include="backends\Raster.h" />
     <ClInclude Include="GlyphBox.h" />
     <ClInclude Include="GlyphInfo.h" />
+    <ClInclude Include="PaintState.h" />
     <ClInclude Include="WindowBase.h" />
     <ClInclude Include="WindowMain.h" />
   </ItemGroup>

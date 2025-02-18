@@ -7,7 +7,7 @@ WindowMain::WindowMain()
     initPosSize();
     initWindow();
     initAlpha();
-    glyphBox.init();
+    glyphBox.init(this);
 }
 
 WindowMain::~WindowMain()
@@ -16,16 +16,26 @@ WindowMain::~WindowMain()
 
 void WindowMain::onPaint(SkCanvas* canvas)
 {
-    canvas->clear(0x22FF66FF);
+    if (paintState == 1) {
+        glyphBox.paintCaret(canvas);
+        paintState = 0;
+        return;
+    }
+    canvas->clear(colorBg);
     glyphBox.paintText(canvas);
-    glyphBox.paintCaret(canvas);
 }
 
 void WindowMain::onShown()
 {
-    //flashCaret();
-    //SetTimer(hwnd, 1001, 600, NULL);
-    //activeKeyboard();
+    SetTimer(hwnd, 1001, 600, NULL);
+    auto pos = glyphBox.getInputPos();
+    activeKeyboard(pos.fX,pos.fY);
+}
+
+void WindowMain::onTimer(const uint32_t& key)
+{
+    paintState = 1;
+    InvalidateRect(hwnd, nullptr, false);
 }
 
 void WindowMain::onSize()
@@ -37,7 +47,6 @@ void WindowMain::onKeyDown(const uint32_t& key)
 {
     if (key == VK_BACK || key == VK_DELETE) {
         //removeShape();
-
     }
     else if (key == VK_ESCAPE) {
         //escPress();

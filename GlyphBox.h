@@ -8,14 +8,16 @@
 #include <include/core/SkFont.h>
 #include "GlyphInfo.h"
 
+class WindowMain;
 class GlyphBox
 {
 public:
 	GlyphBox();
 	~GlyphBox();
-	void init();
+	void init(WindowMain* win);
 	void paintText(SkCanvas* canvas);
 	void paintCaret(SkCanvas* canvas);
+	SkPoint getInputPos();
 private:
 	void initFont();
 	void initInfo();
@@ -38,5 +40,6 @@ private:
 	float fontTop, fontBottom;
 	float lineSpace{ 1.2 };
 	std::vector<GlyphInfo> infos;
+	WindowMain* win;
 };
 
