@@ -52,24 +52,38 @@ void GlyphBox::paintSelectBg(SkCanvas* canvas)
     if (caretXStart == caretXEnd && caretYStart == caretYEnd) {
         return;
     }
+    int line1{ caretYStart }, line2{ caretYEnd }, word1{ caretXStart }, word2{ caretXEnd };
+    if (line2 < line1) {
+        std::swap(line1, line2);
+        std::swap(word1, word2);
+    }
+    else if (line2 == line1) {
+        if (word2 < word1) {
+            std::swap(word1, word2);
+        }
+    }
     auto lineHeight = getLineHeight();
-    auto startPos = getCaretPos(caretXStart, caretYStart);
-    auto endPos = getCaretPos(caretXEnd, caretYEnd);
+    auto startPos = getCaretPos(word1, line1);
+    auto endPos = getCaretPos(word2, line2);
     SkPaint paint;
     paint.setColor(colorSelected);
-    if (caretYStart == caretYEnd) {
+    if (line1 == line2) {
         canvas->drawRect(SkRect::MakeLTRB(startPos.fX, startPos.fY-lineHeight, endPos.fX, endPos.fY), paint);
     }
     else {
-        auto startLineSize = infos[caretYStart].wordPos.size();
-        canvas->drawRect(SkRect::MakeLTRB(startPos.fX, startPos.fY - lineHeight, infos[caretYStart].wordPos[startLineSize-1].fX, startPos.fY), paint);
-        for (size_t i = caretYStart+1; i <= caretYEnd-1; i++)
+        auto startLineSize = infos[line1].wordPos.size();
+        auto rect = SkRect::MakeLTRB(startPos.fX, startPos.fY - lineHeight,
+            infos[line1].wordPos[startLineSize - 1].fX + infos[line1].x, startPos.fY);
+        canvas->drawRect(rect, paint);
+        for (size_t i = line1 +1; i <= line2-1; i++)
         {
             auto pos = getCaretPos(0, i);
             auto size = infos[i].wordPos.size();
-            canvas->drawRect(SkRect::MakeLTRB(infos[i].x, pos.fY - lineHeight, infos[i].wordPos[size - 1].fX, pos.fY), paint);
+            rect.setLTRB(infos[i].x, pos.fY - lineHeight, infos[i].wordPos[size - 1].fX + infos[line1].x, pos.fY);
+            canvas->drawRect(rect, paint);
         }
-        canvas->drawRect(SkRect::MakeLTRB(infos[caretYStart].x, endPos.fY - lineHeight, endPos.fX, endPos.fY), paint);
+        rect.setLTRB(infos[line1].x, endPos.fY - lineHeight, endPos.fX, endPos.fY);
+        canvas->drawRect(rect, paint);
     }
 }
 SkPoint GlyphBox::getInputPos()
@@ -169,7 +183,6 @@ void GlyphBox::moveCaret(const int& x, const int& y)
     if (!flag) {
         caretX = infos[caretY].wordPos.size() - 1;
     }
-    refreshCaret();
 }
 
 void GlyphBox::refreshCaret()
@@ -177,6 +190,16 @@ void GlyphBox::refreshCaret()
     win->paintState = 2;
     caretVisible = true;
     InvalidateRect(win->hwnd, nullptr, false);
+}
+
+void GlyphBox::checkCancelSelection()
+{
+    if (caretYEnd == -1 || caretXEnd == -1 || (caretXStart == caretXEnd && caretYStart == caretYEnd)) {
+        caretXStart = -1;
+        caretXEnd = -1;
+        caretYStart = -1;
+        caretYEnd = -1;
+    }
 }
 
 void GlyphBox::initFont()

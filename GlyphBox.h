@@ -26,8 +26,12 @@ public:
 	void moveCaretDown();
 	void moveCaret(const int& x, const int& y);
 	void refreshCaret();
+	void checkCancelSelection();
 public:
 	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 }, colorSelected{ 0X8822FF88 };
+	int caretX{ 0 }, caretY{ 6 };
+	int caretXStart{ -1 }, caretYStart{ -1 };
+	int caretXEnd{ -1 }, caretYEnd{ -1 };
 private:
 	void initFont();
 	void initInfo();
@@ -42,9 +46,6 @@ private:
 马作的卢飞快，弓如霹雳弦惊。
 了却君王天下事，赢得生前身后名。可怜白发生！
 )" };
-	int caretX{ 0 },caretY{ 6 };
-	int caretXStart{ 2 },caretYStart{ 3 };
-	int caretXEnd{ 8 },caretYEnd{ 5 };
 	bool caretVisible{ true };
 	float padding{ 18 };
 	float fontSize{ 26 };

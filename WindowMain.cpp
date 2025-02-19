@@ -122,6 +122,25 @@ void WindowMain::initPosSize()
 void WindowMain::onMousePress(const int& x, const int& y)
 {
     glyphBox.moveCaret(x, y);
+    glyphBox.caretXStart = glyphBox.caretX;
+    glyphBox.caretYStart = glyphBox.caretY;
+    glyphBox.caretXEnd = -1;
+    glyphBox.caretYEnd = -1;
+    glyphBox.refreshCaret();
 }
 
+void WindowMain::onMouseDrag(const int& x, const int& y)
+{
+    glyphBox.moveCaret(x, y);
+    glyphBox.caretXEnd = glyphBox.caretX;
+    glyphBox.caretYEnd = glyphBox.caretY;
+    //glyphBox.adjustSelection();
+    glyphBox.refreshCaret();
+}
+
+void WindowMain::onMouseRelease(const int& x, const int& y)
+{
+    glyphBox.checkCancelSelection();
+
+}
 

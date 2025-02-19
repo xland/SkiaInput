@@ -28,9 +28,9 @@ SkCanvas* Backend::getCanvas()
 }
 
 bool Backend::isGPUAvailable() {
-    const char* renderer = (const char*)glGetString(GL_RENDERER);
-    if (!renderer) {
-        return false;
-    }
+    //const char* renderer = (const char*)glGetString(GL_RENDERER);
+    //if (!renderer) {
+    //    return false;
+    //}
     return true;
 }
