@@ -32,19 +32,52 @@ void GlyphBox::paintCaret(SkCanvas* canvas)
     paint.setColor(SK_ColorBLACK);
     paint.setStroke(true);
     paint.setStrokeWidth(1);
-    auto height = getLineHeight();
+    auto lineHeight = getLineHeight();
     auto pos = getInputPos();
-    SkPoint startPos(pos.fX, pos.fY - fontBottom + fontTop);
+    SkPoint startPos(pos.fX, pos.fY - lineHeight);
     canvas->drawLine(startPos, pos, paint);
     paint.setBlendMode(SkBlendMode::kSrcOver);
-    auto color = caretVisible || win->paintState != 1 ? win->colorFore : win->colorBg;
+    auto color = caretVisible || win->paintState != 1 ? colorFore : colorBg;
     paint.setColor(color);
     paint.setStroke(true);
     paint.setStrokeWidth(1);
     canvas->drawLine(startPos, pos, paint);
     caretVisible = !caretVisible;
 }
+void GlyphBox::paintSelectBg(SkCanvas* canvas)
+{
+    if (caretXStart == -1 || caretYStart == -1 || caretXEnd == -1 || caretYEnd == -1) {
+        return;
+    }
+    if (caretXStart == caretXEnd && caretYStart == caretYEnd) {
+        return;
+    }
+    auto lineHeight = getLineHeight();
+    auto startPos = getCaretPos(caretXStart, caretYStart);
+    auto endPos = getCaretPos(caretXEnd, caretYEnd);
+    SkPaint paint;
+    paint.setColor(colorSelected);
+    if (caretYStart == caretYEnd) {
+        canvas->drawRect(SkRect::MakeLTRB(startPos.fX, startPos.fY-lineHeight, endPos.fX, endPos.fY), paint);
+    }
+    else {
+        auto startLineSize = infos[caretYStart].wordPos.size();
+        canvas->drawRect(SkRect::MakeLTRB(startPos.fX, startPos.fY - lineHeight, infos[caretYStart].wordPos[startLineSize-1].fX, startPos.fY), paint);
+        for (size_t i = caretYStart+1; i <= caretYEnd-1; i++)
+        {
+            auto pos = getCaretPos(0, i);
+            auto size = infos[i].wordPos.size();
+            canvas->drawRect(SkRect::MakeLTRB(infos[i].x, pos.fY - lineHeight, infos[i].wordPos[size - 1].fX, pos.fY), paint);
+        }
+        canvas->drawRect(SkRect::MakeLTRB(infos[caretYStart].x, endPos.fY - lineHeight, endPos.fX, endPos.fY), paint);
+    }
+}
 SkPoint GlyphBox::getInputPos()
+{
+    return getCaretPos(caretX, caretY);
+}
+
+SkPoint GlyphBox::getCaretPos(const int& caretX, const int& caretY)
 {
     auto x = infos[caretY].wordPos[caretX].fX + infos[caretY].x;
     auto y = infos[caretY].wordPos[caretX].fY + infos[caretY].y;

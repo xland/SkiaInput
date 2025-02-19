@@ -21,7 +21,8 @@ void WindowMain::onPaint(SkCanvas* canvas)
         paintState = 0;
         return;
     }
-    canvas->clear(colorBg);
+    canvas->clear(glyphBox.colorBg);
+    glyphBox.paintSelectBg(canvas);
     glyphBox.paintText(canvas);
 }
 

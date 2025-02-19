@@ -9,7 +9,6 @@ public:
 	WindowMain();
 	~WindowMain();
 public:
-	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 };
 	int paintState{ 0 };
 protected:
 	void onPaint(SkCanvas* canvas) override;
