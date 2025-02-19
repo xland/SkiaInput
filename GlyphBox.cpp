@@ -37,7 +37,8 @@ void GlyphBox::paintCaret(SkCanvas* canvas)
     SkPoint startPos(pos.fX, pos.fY - fontBottom + fontTop);
     canvas->drawLine(startPos, pos, paint);
     paint.setBlendMode(SkBlendMode::kSrcOver);
-    paint.setColor(caretVisible ? win->colorFore :win->colorBg);
+    auto color = caretVisible || win->paintState != 1 ? win->colorFore : win->colorBg;
+    paint.setColor(color);
     paint.setStroke(true);
     paint.setStrokeWidth(1);
     canvas->drawLine(startPos, pos, paint);
@@ -45,11 +46,108 @@ void GlyphBox::paintCaret(SkCanvas* canvas)
 }
 SkPoint GlyphBox::getInputPos()
 {
-    auto x = infos[caretY].wordPos[caretX].fX;
-    auto y0 = infos[caretY].wordPos[caretX].fY;
-    auto y = infos[caretY].y;
-    return SkPoint(x, y0 + fontBottom + y);
+    auto x = infos[caretY].wordPos[caretX].fX + infos[caretY].x;
+    auto y = infos[caretY].wordPos[caretX].fY + infos[caretY].y;
+    return SkPoint(x, y + fontBottom);
 }
+
+void GlyphBox::moveCaretLeft()
+{
+    if (caretX == 0 && caretY == 0) return;
+    caretX -= 1;
+    if (caretX < 0) {
+        caretY -= 1;
+        if (caretY < 0) {
+            caretX = 0;
+            caretY = 0;
+        }
+        else {
+            caretX = infos[caretY].wordPos.size() - 1;
+        }
+    }
+    refreshCaret();
+}
+void GlyphBox::moveCaretRight()
+{
+    if (caretX == infos[caretY].wordPos.size() - 1 && caretY == infos.size() - 1) {
+        return;
+    }
+    caretX += 1;
+    if (caretX >= infos[caretY].wordPos.size()) {
+        caretY += 1;
+        if (caretY >= infos.size()) {
+            caretY = infos.size() - 1;
+            caretX = infos[caretY].wordPos.size()-1;
+        }
+        else {
+            caretX = 0;
+        }
+    }
+    refreshCaret();
+}
+void GlyphBox::moveCaretUp()
+{
+    if (caretY == 0) {
+        return;
+    }
+    caretY -= 1;
+    if (caretX >= infos[caretY].wordPos.size()) {
+        caretX = infos[caretY].wordPos.size() - 1;
+    }
+    refreshCaret();
+}
+void GlyphBox::moveCaretDown()
+{
+    if (caretY == infos.size() - 1) {
+        return;
+    }
+    caretY += 1;
+    if (caretX >= infos[caretY].wordPos.size()) {
+        caretX = infos[caretY].wordPos.size() - 1;
+    }
+    refreshCaret();
+}
+
+void GlyphBox::moveCaret(const int& x, const int& y)
+{
+    auto lineHight = getLineHeight();
+    bool flag{ false };
+    caretY = 0;
+    for (size_t i = 0; i < infos.size(); i++)
+    {
+        if (y < lineHight + infos[i].y) {
+            caretY = i;
+            flag = true;
+            break;
+        }
+    }
+    if (!flag) {
+        caretY = infos.size() - 1;
+    }
+    flag = false;
+    for (size_t i = 0; i < infos[caretY].wordPos.size()-1; i++)
+    {
+        if (x < padding + infos[caretY].wordPos[i].fX + (infos[caretY].wordPos[i + 1].fX - infos[caretY].wordPos[i].fX) / 2) {
+            caretX = i;
+            flag = true;
+            break;
+        }
+    }
+    if (!flag) {
+        caretX = infos[caretY].wordPos.size() - 1;
+    }
+    refreshCaret();
+}
+
+void GlyphBox::refreshCaret()
+{
+    win->paintState = 2;
+    caretVisible = true;
+    InvalidateRect(win->hwnd, nullptr, false);
+    auto pos = getInputPos();
+    win->activeKeyboard(pos.fX, pos.fY);
+}
+
 void GlyphBox::initFont()
 {
     auto fontMgr = SkFontMgr_New_GDI();

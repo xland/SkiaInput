@@ -1,8 +1,6 @@
 #include "WindowMain.h"
 
-void WindowMain::onMousePress(const int& x, const int& y)
-{
-}
+
 
 void WindowMain::onMouseDBClick(const int& x, const int& y)
 {

@@ -18,6 +18,12 @@ public:
 	void paintText(SkCanvas* canvas);
 	void paintCaret(SkCanvas* canvas);
 	SkPoint getInputPos();
+	void moveCaretLeft();
+	void moveCaretRight();
+	void moveCaretUp();
+	void moveCaretDown();
+	void moveCaret(const int& x, const int& y);
+	void refreshCaret();
 private:
 	void initFont();
 	void initInfo();
@@ -32,8 +38,8 @@ private:
 马作的卢飞快，弓如霹雳弦惊。
 了却君王天下事，赢得生前身后名。可怜白发生！
 )" };
-	size_t caretX{ 6 };
-	size_t caretY{ 1 };
+	int caretX{ 0 };
+	int caretY{ 6 };
 	bool caretVisible{ true };
 	float padding{ 18 };
 	float fontSize{ 26 };

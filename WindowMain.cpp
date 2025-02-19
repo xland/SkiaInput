@@ -28,14 +28,15 @@ void WindowMain::onPaint(SkCanvas* canvas)
 void WindowMain::onShown()
 {
     SetTimer(hwnd, 1001, 600, NULL);
-    auto pos = glyphBox.getInputPos();
-    activeKeyboard(pos.fX,pos.fY);
+    glyphBox.refreshCaret();
 }
 
 void WindowMain::onTimer(const uint32_t& key)
 {
-    paintState = 1;
-    InvalidateRect(hwnd, nullptr, false);
+    if (key == 1001) {
+        paintState = 1;
+        InvalidateRect(hwnd, nullptr, false);
+    }
 }
 
 void WindowMain::onSize()
@@ -50,22 +51,18 @@ void WindowMain::onKeyDown(const uint32_t& key)
     }
     else if (key == VK_ESCAPE) {
         //escPress();
-
     }
     else if (key == VK_LEFT) {
-        //moveByKey(0);
-
+        glyphBox.moveCaretLeft();
     }
     else if (key == VK_UP) {
-        //moveByKey(1);
-
+        glyphBox.moveCaretUp();
     }
     else if (key == VK_RIGHT) {
-        //moveByKey(2);
-
+        glyphBox.moveCaretRight();
     }
     else if (key == VK_DOWN) {
-        //moveByKey(3);
+        glyphBox.moveCaretDown();
     }
 }
 
@@ -101,6 +98,9 @@ void WindowMain::initPosSize()
     y = (screenHeight - h) / 2;
 }
 
-
+void WindowMain::onMousePress(const int& x, const int& y)
+{
+    glyphBox.moveCaret(x, y);
+}
 
 

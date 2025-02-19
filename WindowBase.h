@@ -27,6 +27,7 @@ public:
 	WindowBase();
 	~WindowBase();
 	void show();
+	void activeKeyboard(const int& x, const int& y);
 public:
 	int x, y, w, h;
 	HWND hwnd;
@@ -34,7 +35,6 @@ protected:
 	void initWindow();
 	void initContext();
 	bool initAlpha();
-	void activeKeyboard(const int& x, const int& y);
 	virtual void onShown() {};
 	virtual void onSize() {};
 	virtual void onMove() {};
