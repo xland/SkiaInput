@@ -24,6 +24,7 @@ protected:
 	void onMouseMove(const int& x, const int& y) override;
 	void onMousePressRight(const int& x, const int& y) override;
 	void onTimer(const uint32_t& key) override;
+	void onIme() override;
 private:
 	void initPosSize();
 	void paintText();

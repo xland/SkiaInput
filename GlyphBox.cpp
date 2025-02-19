@@ -144,8 +144,6 @@ void GlyphBox::refreshCaret()
     win->paintState = 2;
     caretVisible = true;
     InvalidateRect(win->hwnd, nullptr, false);
-    auto pos = getInputPos();
-    win->activeKeyboard(pos.fX, pos.fY);
 }
 
 void GlyphBox::initFont()

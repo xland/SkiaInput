@@ -27,7 +27,6 @@ public:
 	WindowBase();
 	~WindowBase();
 	void show();
-	void activeKeyboard(const int& x, const int& y);
 public:
 	int x, y, w, h;
 	HWND hwnd;
@@ -48,6 +47,7 @@ protected:
 	virtual void onKeyDown(const uint32_t& key) {};
 	virtual void onKeyDownWithCtrl(const uint32_t& key) {};
 	virtual void onTimer(const uint32_t& key) {};
+	virtual void onIme() {};
 private:
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam);

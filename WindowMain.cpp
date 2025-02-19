@@ -39,6 +39,26 @@ void WindowMain::onTimer(const uint32_t& key)
     }
 }
 
+void WindowMain::onIme()
+{
+    if (HIMC himc = ImmGetContext(hwnd)) {
+        auto pos = glyphBox.getInputPos();
+        long x{ (long)pos.fX }, y{ (long)pos.fY - 8 };
+        CANDIDATEFORM cf = {};
+        cf.dwIndex = 0;
+        cf.dwStyle = CFS_EXCLUDE;
+        cf.ptCurrentPos.x = x;
+        cf.ptCurrentPos.y = y;
+        ImmSetCandidateWindow(himc, &cf);
+        COMPOSITIONFORM cfComp = {};
+        cfComp.dwStyle = CFS_POINT;
+        cfComp.ptCurrentPos.x = x;
+        cfComp.ptCurrentPos.y = y;
+        ImmSetCompositionWindow(himc, &cfComp);
+        ImmReleaseContext(hwnd, himc);
+    }
+}
+
 void WindowMain::onSize()
 {
     //paintText();
