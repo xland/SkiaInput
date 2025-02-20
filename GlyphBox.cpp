@@ -199,6 +199,8 @@ void GlyphBox::checkCancelSelection()
         caretXEnd = -1;
         caretYStart = -1;
         caretYEnd = -1;
+        win->paintState = 0;
+        InvalidateRect(win->hwnd, nullptr, false);
     }
 }
 

@@ -69,7 +69,7 @@ sk_sp<SkSurface> OpenGL::getSurface()
 {
     if (nullptr == surface) {
         auto backendRT = GrBackendRenderTargets::MakeGL(win->w, win->h,
-            3, //sampleCount
+            8, //sampleCount
             0, //stencilBits
             fbInfo);
         surface = SkSurfaces::WrapBackendRenderTarget(grContext.get(),
