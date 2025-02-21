@@ -111,7 +111,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>skia.lib;opengl32.lib;kernel32.lib;user32.lib;shell32.lib;imm32.lib;usp10.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>skia.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;shell32.lib;imm32.lib;usp10.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\sdk\skia\out\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
@@ -135,7 +135,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>skia.lib;opengl32.lib;kernel32.lib;user32.lib;shell32.lib;imm32.lib;usp10.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>skia.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;shell32.lib;imm32.lib;usp10.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\sdk\skia\out\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
@@ -149,7 +149,9 @@
     <ClCompile Include="GlyphBox.cpp" />
     <ClCompile Include="GlyphInfo.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Util.cpp" />
     <ClCompile Include="WindowBase.cpp" />
+    <ClCompile Include="WindowCaret.cpp" />
     <ClCompile Include="WindowMain.cpp" />
     <ClCompile Include="WindowMainKey.cpp" />
     <ClCompile Include="WindowMainMouse.cpp" />
@@ -163,7 +165,9 @@
     <ClInclude Include="GlyphBox.h" />
     <ClInclude Include="GlyphInfo.h" />
     <ClInclude Include="PaintState.h" />
+    <ClInclude Include="Util.h" />
     <ClInclude Include="WindowBase.h" />
+    <ClInclude Include="WindowCaret.h" />
     <ClInclude Include="WindowMain.h" />
   </ItemGroup>
   <ItemGroup>

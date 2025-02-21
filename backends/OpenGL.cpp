@@ -50,27 +50,18 @@ OpenGL::~OpenGL()
 
 void OpenGL::resize()
 {
-    //todo:特殊场景内存泄漏！！！
-    // 有两个屏幕时如果A屏幕设置为主屏的时候，改变窗口大小无内存泄漏，
-    // B屏幕设置为主屏幕时，改变窗口大小则可能导致内存泄漏。
-    // imgui也有类似的问题
     surface.reset(nullptr);
     if (grContext) {
-        //m_grContext->flushAndSubmit();
-        //m_grContext->purgeUnlockedResources(GrPurgeResourceOptions::kAllResources);
-        grContext->abandonContext();
-        grContext.reset(nullptr);
+        grContext->flushAndSubmit();
     }
-    grContext.reset(nullptr);
-    grContext = GrDirectContexts::MakeGL(backendContext);
 }
 
 sk_sp<SkSurface> OpenGL::getSurface()
 {
     if (nullptr == surface) {
         auto backendRT = GrBackendRenderTargets::MakeGL(win->w, win->h,
-            8, //sampleCount
-            0, //stencilBits
+            16, //sampleCount
+            8, //stencilBits
             fbInfo);
         surface = SkSurfaces::WrapBackendRenderTarget(grContext.get(),
             backendRT,
@@ -84,10 +75,6 @@ sk_sp<SkSurface> OpenGL::getSurface()
 
 void OpenGL::init()
 {
-    // 关闭 VSYNC ，否则会由于帧率的抖动导致平均帧率降低。
-    // VSYNC 会阻塞 SkSurface::flush，从而使每帧的耗时接近16.6ms,帧率最多60fps
-    //eglSwapInterval(display_, 0);
-    //eglSwapBuffers(display_, surface_);
     HDC hdc = GetDC(win->hwnd);
     PIXELFORMATDESCRIPTOR pfd = {};
     pfd.nSize = sizeof(pfd);
@@ -128,6 +115,7 @@ void OpenGL::init()
     fbInfo.fFBOID = buffer;
     fbInfo.fFormat = GR_GL_RGBA8;
     fbInfo.fProtected = skgpu::Protected(false);
+    grContext = GrDirectContexts::MakeGL(backendContext);
 }
 
 void OpenGL::paint(HDC dc) {

@@ -1,5 +1,6 @@
 ﻿#include "GlyphBox.h"
 #include "WindowMain.h"
+#include "WindowCaret.h"
 
 GlyphBox::GlyphBox()
 {
@@ -24,25 +25,6 @@ void GlyphBox::paintText(SkCanvas* canvas)
     {
         canvas->drawGlyphs(info.wordPos.size() - 1, info.glyphs.data(), info.wordPos.data(), SkPoint(info.x, info.y), font, paint);
     }
-}
-void GlyphBox::paintCaret(SkCanvas* canvas)
-{
-    SkPaint paint;
-    paint.setBlendMode(SkBlendMode::kClear);
-    paint.setColor(SK_ColorBLACK);
-    paint.setStroke(true);
-    paint.setStrokeWidth(1);
-    auto lineHeight = getLineHeight();
-    auto pos = getInputPos();
-    SkPoint startPos(pos.fX, pos.fY - lineHeight);
-    canvas->drawLine(startPos, pos, paint);
-    paint.setBlendMode(SkBlendMode::kSrcOver);
-    auto color = caretVisible || win->paintState != 1 ? colorFore : colorBg;
-    paint.setColor(color);
-    paint.setStroke(true);
-    paint.setStrokeWidth(1);
-    canvas->drawLine(startPos, pos, paint);
-    caretVisible = !caretVisible;
 }
 void GlyphBox::paintSelectBg(SkCanvas* canvas)
 {
@@ -152,7 +134,6 @@ void GlyphBox::moveCaretDown()
     if (caretX >= infos[caretY].wordPos.size()) {
         caretX = infos[caretY].wordPos.size() - 1;
     }
-    refreshCaret();
 }
 
 void GlyphBox::moveCaret(const int& x, const int& y)
@@ -183,13 +164,7 @@ void GlyphBox::moveCaret(const int& x, const int& y)
     if (!flag) {
         caretX = infos[caretY].wordPos.size() - 1;
     }
-}
-
-void GlyphBox::refreshCaret()
-{
-    win->paintState = 2;
-    caretVisible = true;
-    InvalidateRect(win->hwnd, nullptr, false);
+    refreshCaret();
 }
 
 void GlyphBox::checkCancelSelection()
@@ -199,7 +174,6 @@ void GlyphBox::checkCancelSelection()
         caretXEnd = -1;
         caretYStart = -1;
         caretYEnd = -1;
-        win->paintState = 0;
         InvalidateRect(win->hwnd, nullptr, false);
     }
 }
@@ -252,4 +226,17 @@ float GlyphBox::getLineHeight()
         return height;
         }();
     return lineHeight;
+}
+
+void GlyphBox::refreshCaret()
+{
+    auto lineHeight = getLineHeight();
+    auto pos = getInputPos();
+    if (!caretWin) {
+        caretWin = std::make_shared<WindowCaret>(pos.fX, pos.fY - lineHeight, 2, lineHeight);
+        caretWin->show();
+	}
+    else {
+        caretWin->move(pos.fX, pos.fY - lineHeight);
+    }
 }

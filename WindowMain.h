@@ -9,7 +9,6 @@ public:
 	WindowMain();
 	~WindowMain();
 public:
-	int paintState{ 0 };
 protected:
 	void onPaint(SkCanvas* canvas) override;
 	void onShown() override;

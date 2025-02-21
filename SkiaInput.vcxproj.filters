@@ -51,6 +51,12 @@
     <ClCompile Include="GlyphBox.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="WindowCaret.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowBase.h">
@@ -75,6 +81,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="PaintState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowCaret.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

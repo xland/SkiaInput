@@ -1,12 +1,13 @@
 ﻿#include <sstream>
 #include "WindowMain.h"
+#include "WindowCaret.h"
 
 
 WindowMain::WindowMain()
 {
     initPosSize();
     initWindow();
-    initAlpha();
+	Util::alphaWindow(hwnd);
     glyphBox.init(this);
 }
 
@@ -16,11 +17,6 @@ WindowMain::~WindowMain()
 
 void WindowMain::onPaint(SkCanvas* canvas)
 {
-    if (paintState == 1) {
-        glyphBox.paintCaret(canvas);
-        paintState = 0;
-        return;
-    }
     canvas->clear(glyphBox.colorBg);
     glyphBox.paintSelectBg(canvas);
     glyphBox.paintText(canvas);
@@ -28,15 +24,12 @@ void WindowMain::onPaint(SkCanvas* canvas)
 
 void WindowMain::onShown()
 {
-    SetTimer(hwnd, 1001, 600, NULL);
-    glyphBox.refreshCaret();
+    
 }
 
 void WindowMain::onTimer(const uint32_t& key)
 {
     if (key == 1001) {
-        paintState = 1;
-        InvalidateRect(hwnd, nullptr, false);
     }
 }
 
@@ -121,12 +114,15 @@ void WindowMain::initPosSize()
 
 void WindowMain::onMousePress(const int& x, const int& y)
 {
-    glyphBox.moveCaret(x, y);
-    glyphBox.caretXStart = glyphBox.caretX;
-    glyphBox.caretYStart = glyphBox.caretY;
-    glyphBox.caretXEnd = -1;
-    glyphBox.caretYEnd = -1;
-    glyphBox.refreshCaret();
+    SetCaretPos(60, 60);
+    ShowCaret(hwnd);
+
+    //glyphBox.moveCaret(x, y);
+    //glyphBox.caretXStart = glyphBox.caretX;
+    //glyphBox.caretYStart = glyphBox.caretY;
+    //glyphBox.caretXEnd = -1;
+    //glyphBox.caretYEnd = -1;
+    //glyphBox.refreshCaret();
 }
 
 void WindowMain::onMouseDrag(const int& x, const int& y)
@@ -134,8 +130,6 @@ void WindowMain::onMouseDrag(const int& x, const int& y)
     glyphBox.moveCaret(x, y);
     glyphBox.caretXEnd = glyphBox.caretX;
     glyphBox.caretYEnd = glyphBox.caretY;
-    //glyphBox.adjustSelection();
-    glyphBox.refreshCaret();
 }
 
 void WindowMain::onMouseRelease(const int& x, const int& y)
