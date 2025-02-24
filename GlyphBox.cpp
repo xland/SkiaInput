@@ -15,6 +15,7 @@ void GlyphBox::init(WindowMain* win)
     this->win = win;
     initFont();
     initInfo();
+	caretWin = std::make_shared<WindowCaret>(getLineHeight(), win);
 }
 void GlyphBox::paintText(SkCanvas* canvas)
 {
@@ -25,6 +26,7 @@ void GlyphBox::paintText(SkCanvas* canvas)
     {
         canvas->drawGlyphs(info.wordPos.size() - 1, info.glyphs.data(), info.wordPos.data(), SkPoint(info.x, info.y), font, paint);
     }
+    refreshCaret();
 }
 void GlyphBox::paintSelectBg(SkCanvas* canvas)
 {
@@ -232,11 +234,5 @@ void GlyphBox::refreshCaret()
 {
     auto lineHeight = getLineHeight();
     auto pos = getInputPos();
-    if (!caretWin) {
-        caretWin = std::make_shared<WindowCaret>(pos.fX, pos.fY - lineHeight, 2, lineHeight);
-        caretWin->show();
-	}
-    else {
-        caretWin->move(pos.fX, pos.fY - lineHeight);
-    }
+    caretWin->moveCaret(pos.fX, pos.fY - lineHeight);
 }

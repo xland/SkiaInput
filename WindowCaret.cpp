@@ -1,33 +1,35 @@
-#include <memory>
+﻿#include <memory>
 #include "WindowCaret.h"
 #include "Util.h"
 #include "WindowMain.h"
 
-namespace{
-	std::shared_ptr<WindowCaret> caretWin;
-}
 
-
-WindowCaret::WindowCaret(const int& height):h{height}
+WindowCaret::WindowCaret(const int& height,WindowMain* win):h{height},win{win}
 {
     initWindow();
     pixels.resize(w * h);
     SetTimer(hwnd, 1001, 600, NULL);
+	win->funcMove.push_back(std::bind(&WindowCaret::moveWin, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 WindowCaret::~WindowCaret()
 {
 }
 
-void WindowCaret::init(const int& height)
+void WindowCaret::moveCaret(const int& x, const int& y)
 {
-	caretWin = std::make_shared<WindowCaret>(height);
+ //   this->x = x;
+ //   this->y = y;
+	//SetWindowPos(hwnd, HWND_TOPMOST, 
+ //       100, 100, 0, 0, 
+ //       SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
 }
 
-void WindowCaret::move(const int& x, const int& y, WindowMain* win)
+void WindowCaret::moveWin(const int& x, const int& y)
 {
-	SetWindowPos(caretWin->hwnd, HWND_TOPMOST, 
-        x+win->x, y+win->y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
+	//SetWindowPos(hwnd, HWND_TOPMOST,
+ //       win->x + this->x, win->y + this->y, 0, 0, 
+ //       SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
 }
 
 void WindowCaret::initWindow()
@@ -45,7 +47,8 @@ void WindowCaret::initWindow()
     wcx.lpszClassName = clsName;
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOPMOST,  
-        clsName, clsName, WS_POPUP, x, y, w, h, nullptr, nullptr, hinstance, nullptr);
+        clsName, clsName, WS_CHILD | WS_VISIBLE, x, y, w, h, win->hwnd, nullptr, hinstance, nullptr);
+    SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA);
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
 }
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <vector>
 #include <Windows.h>
 #include <windowsx.h>
@@ -8,14 +8,14 @@ class WindowMain;
 class WindowCaret
 {
 public:
+	WindowCaret(const int& height, WindowMain* win);
 	~WindowCaret();
-	static void init(const int& height);
-	static void move(const int&x,const int& y,WindowMain* win);
+	void moveCaret(const int&x,const int& y);
+	void moveWin(const int& x, const int& y);
 public:
-	int x{ 0 }, y{ 0 }, w{ 2 }, h{0};
+	int x{ 110 }, y{ 110 }, w{ 2 }, h{0};
 	HWND hwnd;
 private:
-	WindowCaret(const int& height);
 	void initWindow();
 	void onPaint();
 private:
@@ -23,5 +23,7 @@ private:
 private:
 	std::vector<DWORD> pixels;
 	DWORD color{ 0xFF000000 };
+	WindowMain* win;
+
 };
 

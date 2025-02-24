@@ -9,6 +9,17 @@ WindowMain::WindowMain()
     initWindow();
 	Util::alphaWindow(hwnd);
     glyphBox.init(this);
+
+	funcPaint.push_back(std::bind(&WindowMain::onPaint, this, std::placeholders::_1));
+	funcShown.push_back(std::bind(&WindowMain::onShown, this));
+	funcSize.push_back(std::bind(&WindowMain::onSize, this));
+	funcKeyDown.push_back(std::bind(&WindowMain::onKeyDown, this, std::placeholders::_1));
+	funcKeyDownWithCtrl.push_back(std::bind(&WindowMain::onKeyDownWithCtrl, this, std::placeholders::_1));
+	funcMousePress.push_back(std::bind(&WindowMain::onMousePress, this, std::placeholders::_1, std::placeholders::_2));
+	funcMouseDrag.push_back(std::bind(&WindowMain::onMouseDrag, this, std::placeholders::_1, std::placeholders::_2));
+	funcMouseRelease.push_back(std::bind(&WindowMain::onMouseRelease, this, std::placeholders::_1, std::placeholders::_2));
+	funcIme.push_back(std::bind(&WindowMain::onIme, this));
+	funcTimer.push_back(std::bind(&WindowMain::onTimer, this, std::placeholders::_1));
 }
 
 WindowMain::~WindowMain()

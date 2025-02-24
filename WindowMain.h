@@ -10,19 +10,19 @@ public:
 	~WindowMain();
 public:
 protected:
-	void onPaint(SkCanvas* canvas) override;
-	void onShown() override;
-	void onSize() override;
-	void onKeyDown(const uint32_t& key) override;
-	void onKeyDownWithCtrl(const uint32_t& key) override;
-	void onMousePress(const int& x, const int& y) override;
-	void onMouseDBClick(const int& x, const int& y) override;
-	void onMouseRelease(const int& x, const int& y) override;
-	void onMouseDrag(const int& x, const int& y) override;
-	void onMouseMove(const int& x, const int& y) override;
-	void onMousePressRight(const int& x, const int& y) override;
-	void onTimer(const uint32_t& key) override;
-	void onIme() override;
+	void onPaint(SkCanvas* canvas);
+	void onShown();
+	void onSize();
+	void onKeyDown(const uint32_t& key);
+	void onKeyDownWithCtrl(const uint32_t& key);
+	void onMousePress(const int& x, const int& y);
+	void onMouseDBClick(const int& x, const int& y);
+	void onMouseRelease(const int& x, const int& y);
+	void onMouseDrag(const int& x, const int& y);
+	void onMouseMove(const int& x, const int& y);
+	void onMousePressRight(const int& x, const int& y);
+	void onTimer(const uint32_t& key);
+	void onIme();
 private:
 	void initPosSize();
 	void paintText();

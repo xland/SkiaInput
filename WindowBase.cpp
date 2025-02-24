@@ -86,7 +86,7 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_MOVE: {
         x = LOWORD(lParam);
         y = HIWORD(lParam);
-        onMove();
+        onMove(x,y);
         return 0;
     }
     case WM_SIZE: {
@@ -94,7 +94,7 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         w = LOWORD(lParam);
         h = HIWORD(lParam);
         backend->resize();
-        onSize();
+        onSize(w,h);
         return 0;
     }
     case WM_PAINT: {
@@ -156,4 +156,116 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
     }
     }
     return 0;
+}
+
+void WindowBase::onShown()
+{
+    for (const auto& func : funcShown)
+    {
+        func();
+    }
+}
+
+void WindowBase::onSize(const int& w, const int& h)
+{
+    for (const auto& func : funcSize)
+    {
+        func(w,h);
+    }
+}
+
+void WindowBase::onMove(const int& x, const int& y)
+{
+    for (const auto& func : funcMove)
+    {
+        func(x,y);
+    }
+}
+
+void WindowBase::onPaint(SkCanvas* canvas)
+{
+	for (const auto& func : funcPaint)
+	{
+        func(canvas);
+	}
+}
+
+void WindowBase::onMousePress(const int& x, const int& y)
+{
+	for (const auto& func : funcMousePress)
+	{
+        func(x, y);
+	}
+}
+
+void WindowBase::onMousePressRight(const int& x, const int& y)
+{
+	for (const auto& func : funcMousePressRight)
+	{
+        func(x, y);
+	}
+}
+
+void WindowBase::onMouseDBClick(const int& x, const int& y)
+{
+	for (const auto& func : funcMouseDBClick)
+	{
+        func(x, y);
+	}
+}
+
+void WindowBase::onMouseMove(const int& x, const int& y)
+{
+	for (const auto& func : funcMouseMove)
+	{
+        func(x, y);
+	}
+}
+
+void WindowBase::onMouseDrag(const int& x, const int& y)
+{
+	for (const auto& func : funcMouseDrag)
+	{
+        func(x, y);
+	}
+}
+
+void WindowBase::onMouseRelease(const int& x, const int& y)
+{
+	for (const auto& func : funcMouseRelease)
+	{
+        func(x, y);
+	}
+}
+
+void WindowBase::onKeyDown(const uint32_t& key)
+{
+	for (const auto& func : funcKeyDown)
+	{
+        func(key);
+	}
+}
+
+void WindowBase::onKeyDownWithCtrl(const uint32_t& key)
+{
+	for (const auto& func : funcKeyDownWithCtrl)
+	{
+        func(key);
+	}
+}
+
+void WindowBase::onTimer(const uint32_t& key)
+{
+	for (const auto& func : funcTimer)
+	{
+        func(key);
+	}
+}
+
+void WindowBase::onIme()
+{
+    for (const auto& func : funcIme)
+	{
+        func();
+	}
 }
