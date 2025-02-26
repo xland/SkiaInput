@@ -18,30 +18,32 @@ public:
 	void init(WindowMain* win);
 	void paintText(SkCanvas* canvas);
 	void paintSelectBg(SkCanvas* canvas);
-	SkPoint getInputPos();
-	SkPoint getCaretPos(const int& caretX,const int& caretY);
-	void moveCaretLeft();
-	void moveCaretRight();
-	void moveCaretUp();
-	void moveCaretDown();
 	void moveCaret(const int& x, const int& y);
 	void checkCancelSelection();
 	void refreshCaret();
 	void onChar(const std::wstring& str);
 	void onKey(const uint32_t& key);
+	void onKeyWithCtrl(const uint32_t& key);
+	void onIme();
 public:
 	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 }, colorSelected{ 0X8822FF88 };
-	int caretX{ 2 }, caretY{ 0 };
+	int caretX{ 3 }, caretY{ 1 };
 	int caretXStart{ -1 }, caretYStart{ -1 };
 	int caretXEnd{ -1 }, caretYEnd{ -1 };
 private:
+	void moveCaretLeft();
+	void moveCaretRight();
+	void moveCaretUp();
+	void moveCaretDown();
 	void keyBack();
 	void keyEnter();
 	void keyDel();
-	int getCharIndex();
 	void initFont();
 	void initInfo();
 	float getLineHeight();
+	void copy();
+	SkPoint getCaretPos(const int& caretX, const int& caretY);
+	int getCharIndex(const int& caretX, const int& caretY);
 private:
 	SkFont font;
 	std::wstring text{ LR"(破阵子 · 为陈同甫赋壮词以寄之

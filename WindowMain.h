@@ -9,18 +9,17 @@ public:
 	WindowMain();
 	~WindowMain();
 public:
+	bool setClipboard(const std::wstring& text);
 protected:
 	void onPaint(SkCanvas* canvas);
 	void onShown();
 	void onSize();
-	void onKeyDownWithCtrl(const uint32_t& key);
 	void onMousePress(const int& x, const int& y);
 	void onMouseDBClick(const int& x, const int& y);
 	void onMouseRelease(const int& x, const int& y);
 	void onMouseDrag(const int& x, const int& y);
 	void onMouseMove(const int& x, const int& y);
 	void onMousePressRight(const int& x, const int& y);
-	void onIme();
 private:
 	void initPosSize();
 	void paintText();

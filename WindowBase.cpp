@@ -10,7 +10,7 @@ WindowBase::~WindowBase()
 
 void WindowBase::initWindow()
 {
-    const TCHAR clsName[] = L"BlendInput";
+    const TCHAR clsName[] = L"SkiaInput";
     static WNDCLASSEX wcx;
     static bool isClsReg = false;
     auto hinstance = GetModuleHandle(NULL);
@@ -66,7 +66,8 @@ LRESULT WindowBase::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
     case WM_DESTROY:
     {
         SetWindowLongPtr(hWnd, GWLP_USERDATA, 0);
-        UnregisterClass(L"ScreenCapture", nullptr);
+        UnregisterClass(L"SkiaInput", nullptr);
+		PostQuitMessage(0);
         return 0;
     }
     default:

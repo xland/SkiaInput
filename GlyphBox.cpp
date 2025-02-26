@@ -18,7 +18,10 @@ void GlyphBox::init(WindowMain* win)
 	caretWin = std::make_shared<WindowCaret>(getLineHeight(), win);
 	win->funcChar.push_back(std::bind(&GlyphBox::onChar, this, std::placeholders::_1));
     win->funcKeyDown.push_back(std::bind(&GlyphBox::onKey, this, std::placeholders::_1));
+	win->funcKeyDownWithCtrl.push_back(std::bind(&GlyphBox::onKeyWithCtrl, this, std::placeholders::_1));
+	win->funcIme.push_back(std::bind(&GlyphBox::onIme, this));
 }
+
 void GlyphBox::paintText(SkCanvas* canvas)
 {
     SkPaint paint;
@@ -71,10 +74,6 @@ void GlyphBox::paintSelectBg(SkCanvas* canvas)
         rect.setLTRB(infos[line1].x, endPos.fY - lineHeight, endPos.fX, endPos.fY);
         canvas->drawRect(rect, paint);
     }
-}
-SkPoint GlyphBox::getInputPos()
-{
-    return getCaretPos(caretX, caretY);
 }
 
 SkPoint GlyphBox::getCaretPos(const int& caretX, const int& caretY)
@@ -185,7 +184,7 @@ void GlyphBox::checkCancelSelection()
 void GlyphBox::keyBack()
 {
     if (caretX == 0 && caretY == 0) return;
-	auto charIndex = getCharIndex();
+	auto charIndex = getCharIndex(caretX, caretY);
     caretX -= 1;
     if (caretX < 0) {
         caretY -= 1;
@@ -203,7 +202,7 @@ void GlyphBox::keyBack()
 }
 void GlyphBox::keyEnter()
 {
-    auto charIndex = getCharIndex();
+    auto charIndex = getCharIndex(caretX, caretY);
     text.insert(charIndex, L"\n");
     caretX = 0;
     caretY += 1;
@@ -215,12 +214,12 @@ void GlyphBox::keyDel()
     if (caretX == infos[caretY].wordPos.size() - 1 && caretY == infos.size() - 1) {
         return;
     }
-    auto charIndex = getCharIndex();
+    auto charIndex = getCharIndex(caretX,caretY);
     text.erase(charIndex, 1);
 	initInfo();
 	InvalidateRect(win->hwnd, nullptr, false);
 }
-int GlyphBox::getCharIndex()
+int GlyphBox::getCharIndex(const int& caretX, const int& caretY)
 {
     std::wstringstream ss(text);
     std::wstring line;
@@ -289,16 +288,30 @@ float GlyphBox::getLineHeight()
     return lineHeight;
 }
 
+void GlyphBox::copy()
+{
+    if (caretXStart == -1 || caretYStart == -1 || caretXEnd == -1 || caretYEnd == -1) {
+        return;
+    }
+    if (caretXStart == caretXEnd && caretYStart == caretYEnd) {
+        return;
+    }
+    auto charIndex0 = getCharIndex(caretXStart, caretYStart);
+    auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
+	auto str = text.substr(charIndex0, charIndex1 - charIndex0);
+	win->setClipboard(str);
+}
+
 void GlyphBox::refreshCaret()
 {
     auto lineHeight = getLineHeight();
-    auto pos = getInputPos();
+    auto pos = getCaretPos(caretX, caretY);
     caretWin->moveCaret(pos.fX, pos.fY - lineHeight);
 }
 
 void GlyphBox::onChar(const std::wstring& str)
 {
-    auto charIndex = getCharIndex();
+    auto charIndex = getCharIndex(caretX, caretY);
     text.insert(charIndex, str);
     caretX += str.length();
     initInfo();
@@ -330,5 +343,47 @@ void GlyphBox::onKey(const uint32_t& key)
     }
     else if (key == VK_DELETE) {
         moveCaretDown();
+    }
+}
+
+void GlyphBox::onKeyWithCtrl(const uint32_t& key)
+{
+	if (key == 'Z') {
+		//undo(); 撤销
+	}
+	else if (key == 'Y') {
+		//redo(); 重做
+	}
+	else if (key == 'C') {
+        copy();
+	}
+	else if (key == 'V') {
+		//copyColor(1); RGB
+	}
+	else if (key == 'X') {
+		//copyColor(1); RGB
+	}
+	else if (key == 'A') {
+		//copyColor(1); RGB
+	}
+}
+
+void GlyphBox::onIme()
+{
+    if (HIMC himc = ImmGetContext(win->hwnd)) {
+        auto pos = getCaretPos(caretX, caretY);
+        long x{ (long)pos.fX }, y{ (long)pos.fY - 8 };
+        CANDIDATEFORM cf = {};
+        cf.dwIndex = 0;
+        cf.dwStyle = CFS_EXCLUDE;
+        cf.ptCurrentPos.x = x;
+        cf.ptCurrentPos.y = y;
+        ImmSetCandidateWindow(himc, &cf);
+        COMPOSITIONFORM cfComp = {};
+        cfComp.dwStyle = CFS_POINT;
+        cfComp.ptCurrentPos.x = x;
+        cfComp.ptCurrentPos.y = y;
+        ImmSetCompositionWindow(himc, &cfComp);
+        ImmReleaseContext(win->hwnd, himc);
     }
 }
