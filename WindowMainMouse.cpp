@@ -50,4 +50,27 @@ bool WindowMain::setClipboard(const std::wstring& text)
     return true;
 }
 
+std::wstring WindowMain::getClipboard()
+{
+    if (!OpenClipboard(nullptr))
+    {
+        return L"";
+    }
+    if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
+    {
+        CloseClipboard();
+        return L"";
+    }
+    HGLOBAL hGlobal = GetClipboardData(CF_UNICODETEXT);
+    if (hGlobal == nullptr)
+    {
+        CloseClipboard();
+        return L"";
+    }
+    std::wstring result{ static_cast<wchar_t*>(GlobalLock(hGlobal)) };    
+    GlobalUnlock(hGlobal);
+    CloseClipboard();
+	return result;
+}
+
 

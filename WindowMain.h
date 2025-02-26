@@ -10,6 +10,7 @@ public:
 	~WindowMain();
 public:
 	bool setClipboard(const std::wstring& text);
+	std::wstring getClipboard();
 protected:
 	void onPaint(SkCanvas* canvas);
 	void onShown();

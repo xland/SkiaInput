@@ -302,6 +302,44 @@ void GlyphBox::copy()
 	win->setClipboard(str);
 }
 
+void GlyphBox::paste()
+{
+	auto str = win->getClipboard();
+	if (str.empty()) return;
+    size_t x{ str.size()}, y{0}, pos{0};
+    while ((pos = str.find(L"\r\n")) != std::wstring::npos)
+    {
+        str.replace(pos, 2, L"\n");
+		y += 1;
+		x = str.size() -1 - pos;
+    }
+    auto flag1 = (caretXStart == -1 || caretYStart == -1 || caretXEnd == -1 || caretYEnd == -1);
+    auto flag2 = (caretXStart == caretXEnd && caretYStart == caretYEnd);
+	if (flag1 || flag2) {
+        auto charIndex = getCharIndex(caretX, caretY);
+        text.insert(charIndex, str);
+	}
+	else {
+        auto charIndex0 = getCharIndex(caretXStart, caretYStart);
+        auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
+        text.erase(charIndex0, charIndex1 - charIndex0);
+        caretX = caretXStart;
+        caretY = caretYStart;
+        text.insert(charIndex0, str);
+	}
+    if (y == 0) {
+        caretX += x;
+    }
+    else {
+        caretY += y;
+		caretX = x;
+    }
+    caretXStart = -1;  caretYStart = -1; 
+    caretXEnd = -1;  caretYEnd = -1;
+	initInfo();
+	InvalidateRect(win->hwnd, nullptr, false);
+}
+
 void GlyphBox::refreshCaret()
 {
     auto lineHeight = getLineHeight();
@@ -358,7 +396,7 @@ void GlyphBox::onKeyWithCtrl(const uint32_t& key)
         copy();
 	}
 	else if (key == 'V') {
-		//copyColor(1); RGB
+        paste();
 	}
 	else if (key == 'X') {
 		//copyColor(1); RGB
