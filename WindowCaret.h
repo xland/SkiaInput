@@ -13,7 +13,7 @@ public:
 	void moveCaret(const int&x,const int& y);
 	void moveWin(const int& x, const int& y);
 public:
-	int x{ 110 }, y{ 110 }, w{ 1 }, h{0};
+	int  w{ 1 }, h{0};
 	HWND hwnd;
 private:
 	void initWindow();

@@ -26,6 +26,7 @@ public:
 	void moveCaretDown();
 	void moveCaret(const int& x, const int& y);
 	void checkCancelSelection();
+	void refreshCaret();
 public:
 	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 }, colorSelected{ 0X8822FF88 };
 	int caretX{ 0 }, caretY{ 6 };
@@ -35,7 +36,6 @@ private:
 	void initFont();
 	void initInfo();
 	float getLineHeight();
-	void refreshCaret();
 private:
 	SkFont font;
 	std::wstring text{ LR"(破阵子 · 为陈同甫赋壮词以寄之

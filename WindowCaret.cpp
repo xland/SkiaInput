@@ -18,8 +18,6 @@ WindowCaret::~WindowCaret()
 
 void WindowCaret::moveCaret(const int& x, const int& y)
 {
-    this->x = x;
-    this->y = y;
 	SetWindowPos(hwnd, HWND_TOPMOST, 
         x, y, 0, 0,
         SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
@@ -47,7 +45,7 @@ void WindowCaret::initWindow()
     wcx.lpszClassName = clsName;
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOPMOST,  
-        clsName, clsName, WS_POPUP, x, y, w, h, nullptr, nullptr, hinstance, nullptr);
+        clsName, clsName, WS_POPUP, 0, 0, w, h, nullptr, nullptr, hinstance, nullptr);
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
     SetParent(hwnd, win->hwnd);
@@ -116,11 +114,6 @@ LRESULT WindowCaret::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             if (wParam == 1001) {
 				obj->onPaint();
             }
-            return 0;
-        }
-        case WM_MOVE: {
-            obj->x = LOWORD(lParam);
-            obj->y = HIWORD(lParam);
             return 0;
         }
         default:
