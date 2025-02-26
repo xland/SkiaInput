@@ -42,6 +42,7 @@ private:
 	void initInfo();
 	float getLineHeight();
 	void copy();
+	void cut();
 	void paste();
 	SkPoint getCaretPos(const int& caretX, const int& caretY);
 	int getCharIndex(const int& caretX, const int& caretY);

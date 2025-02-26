@@ -302,6 +302,11 @@ void GlyphBox::copy()
 	win->setClipboard(str);
 }
 
+void GlyphBox::cut()
+{
+
+}
+
 void GlyphBox::paste()
 {
 	auto str = win->getClipboard();
