@@ -130,7 +130,6 @@ void WindowMain::onMousePress(const int& x, const int& y)
     glyphBox.caretYStart = glyphBox.caretY;
     glyphBox.caretXEnd = -1;
     glyphBox.caretYEnd = -1;
-    glyphBox.refreshCaret();
 }
 
 void WindowMain::onMouseDrag(const int& x, const int& y)
@@ -138,6 +137,7 @@ void WindowMain::onMouseDrag(const int& x, const int& y)
     glyphBox.moveCaret(x, y);
     glyphBox.caretXEnd = glyphBox.caretX;
     glyphBox.caretYEnd = glyphBox.caretY;
+    InvalidateRect(hwnd, nullptr, false);
 }
 
 void WindowMain::onMouseRelease(const int& x, const int& y)

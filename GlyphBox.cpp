@@ -179,7 +179,6 @@ void GlyphBox::checkCancelSelection()
         InvalidateRect(win->hwnd, nullptr, false);
     }
 }
-
 void GlyphBox::initFont()
 {
     auto fontMgr = SkFontMgr_New_GDI();

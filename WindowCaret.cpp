@@ -9,7 +9,6 @@ WindowCaret::WindowCaret(const int& height,WindowMain* win):h{height},win{win}
     initWindow();
     pixels.resize(w * h);
     SetTimer(hwnd, 1001, 600, NULL);
-	win->funcMove.push_back(std::bind(&WindowCaret::moveWin, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 WindowCaret::~WindowCaret()
@@ -18,16 +17,8 @@ WindowCaret::~WindowCaret()
 
 void WindowCaret::moveCaret(const int& x, const int& y)
 {
-	SetWindowPos(hwnd, HWND_TOPMOST, 
-        x, y, 0, 0,
+	SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0,
         SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
-}
-
-void WindowCaret::moveWin(const int& x, const int& y)
-{
-	//SetWindowPos(hwnd, HWND_TOPMOST,
- //       win->x + this->x, win->y + this->y, 0, 0, 
- //       SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
 }
 
 void WindowCaret::initWindow()
@@ -40,14 +31,11 @@ void WindowCaret::initWindow()
     wcx.lpfnWndProc = &WindowCaret::routeWinMsg;
     wcx.cbWndExtra = sizeof(WindowCaret*);
     wcx.hInstance = hinstance;
-    wcx.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcx.hCursor = LoadCursor(NULL, IDC_IBEAM);
     wcx.lpszClassName = clsName;
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOPMOST,  
         clsName, clsName, WS_POPUP, 0, 0, w, h, nullptr, nullptr, hinstance, nullptr);
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
-
     SetParent(hwnd, win->hwnd);
 }
 
