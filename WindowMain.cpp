@@ -13,7 +13,6 @@ WindowMain::WindowMain()
 	funcPaint.push_back(std::bind(&WindowMain::onPaint, this, std::placeholders::_1));
 	funcShown.push_back(std::bind(&WindowMain::onShown, this));
 	funcSize.push_back(std::bind(&WindowMain::onSize, this));
-	funcKeyDown.push_back(std::bind(&WindowMain::onKeyDown, this, std::placeholders::_1));
 	funcKeyDownWithCtrl.push_back(std::bind(&WindowMain::onKeyDownWithCtrl, this, std::placeholders::_1));
 	funcMousePress.push_back(std::bind(&WindowMain::onMousePress, this, std::placeholders::_1, std::placeholders::_2));
 	funcMouseDrag.push_back(std::bind(&WindowMain::onMouseDrag, this, std::placeholders::_1, std::placeholders::_2));
@@ -59,28 +58,6 @@ void WindowMain::onIme()
 void WindowMain::onSize()
 {
     //paintText();
-}
-
-void WindowMain::onKeyDown(const uint32_t& key)
-{
-    if (key == VK_BACK || key == VK_DELETE) {
-        //removeShape();
-    }
-    else if (key == VK_ESCAPE) {
-        //escPress();
-    }
-    else if (key == VK_LEFT) {
-        glyphBox.moveCaretLeft();
-    }
-    else if (key == VK_UP) {
-        glyphBox.moveCaretUp();
-    }
-    else if (key == VK_RIGHT) {
-        glyphBox.moveCaretRight();
-    }
-    else if (key == VK_DOWN) {
-        glyphBox.moveCaretDown();
-    }
 }
 
 void WindowMain::onKeyDownWithCtrl(const uint32_t& key)

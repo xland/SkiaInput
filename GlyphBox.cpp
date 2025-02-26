@@ -17,6 +17,7 @@ void GlyphBox::init(WindowMain* win)
     initInfo();
 	caretWin = std::make_shared<WindowCaret>(getLineHeight(), win);
 	win->funcChar.push_back(std::bind(&GlyphBox::onChar, this, std::placeholders::_1));
+    win->funcKeyDown.push_back(std::bind(&GlyphBox::onKey, this, std::placeholders::_1));
 }
 void GlyphBox::paintText(SkCanvas* canvas)
 {
@@ -181,6 +182,62 @@ void GlyphBox::checkCancelSelection()
         InvalidateRect(win->hwnd, nullptr, false);
     }
 }
+void GlyphBox::keyBack()
+{
+    if (caretX == 0 && caretY == 0) return;
+	auto charIndex = getCharIndex();
+    caretX -= 1;
+    if (caretX < 0) {
+        caretY -= 1;
+        if (caretY < 0) {
+            caretX = 0;
+            caretY = 0;
+        }
+        else {
+            caretX = infos[caretY].wordPos.size() - 1;
+        }
+    }
+    text.erase(charIndex - 1, 1);
+    initInfo();
+    InvalidateRect(win->hwnd, nullptr, false);
+}
+void GlyphBox::keyEnter()
+{
+    auto charIndex = getCharIndex();
+    text.insert(charIndex, L"\n");
+    caretX = 0;
+    caretY += 1;
+    initInfo();
+    InvalidateRect(win->hwnd, nullptr, false);
+}
+void GlyphBox::keyDel()
+{
+    if (caretX == infos[caretY].wordPos.size() - 1 && caretY == infos.size() - 1) {
+        return;
+    }
+    auto charIndex = getCharIndex();
+    text.erase(charIndex, 1);
+	initInfo();
+	InvalidateRect(win->hwnd, nullptr, false);
+}
+int GlyphBox::getCharIndex()
+{
+    std::wstringstream ss(text);
+    std::wstring line;
+    int lineIndex{ 0 };
+    int charIndex{ 0 };
+    while (std::getline(ss, line)) {
+        if (caretY == lineIndex) {
+            charIndex += caretX;
+            break;
+        }
+        else {
+            charIndex += line.length() + 1;
+            lineIndex += 1;
+        }
+    }
+	return charIndex;
+}
 void GlyphBox::initFont()
 {
     auto fontMgr = SkFontMgr_New_GDI();
@@ -241,34 +298,37 @@ void GlyphBox::refreshCaret()
 
 void GlyphBox::onChar(const std::wstring& str)
 {
-    std::wstringstream ss(text);
-    std::wstring line;
-    int lineIndex{ 0 };
-    int charIndex{ 0 };
-    while (std::getline(ss, line)) {
-        if (caretY == lineIndex) {
-			charIndex += caretX;
-            break;
-        }
-        else {
-            charIndex += line.length() + 1;
-            lineIndex += 1;
-        }
-    }
-
-    if (str == L"\r") {
-		text.insert(charIndex, L"\n");
-		caretX = 0;
-		caretY += 1;
-    }
-    else if (str == L"\b")
-    {
-
-    }
-    else {
-        text.insert(charIndex, str);
-        caretX += str.length();
-    }
+    auto charIndex = getCharIndex();
+    text.insert(charIndex, str);
+    caretX += str.length();
     initInfo();
 	InvalidateRect(win->hwnd, nullptr, false);
+}
+
+void GlyphBox::onKey(const uint32_t& key)
+{
+    if (key == VK_BACK) {
+        keyBack();
+    }
+    else if (key == VK_RETURN) {
+        keyEnter();
+    }
+    else if (key == VK_DELETE) {
+        keyDel();
+    }
+    else if (key == VK_LEFT) {
+        moveCaretLeft();
+    }
+    else if (key == VK_UP) {
+        moveCaretUp();
+    }
+    else if (key == VK_RIGHT) {
+        moveCaretRight();
+    }
+    else if (key == VK_DOWN) {
+        moveCaretDown();
+    }
+    else if (key == VK_DELETE) {
+        moveCaretDown();
+    }
 }

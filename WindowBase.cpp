@@ -152,6 +152,7 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     case WM_CHAR: {
+        if (wParam <= 31 || wParam == 127) return 0;// 直接返回，不处理控制字符
         onChar(std::wstring{ (wchar_t)wParam });
 		return 0;
     }

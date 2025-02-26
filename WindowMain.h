@@ -13,7 +13,6 @@ protected:
 	void onPaint(SkCanvas* canvas);
 	void onShown();
 	void onSize();
-	void onKeyDown(const uint32_t& key);
 	void onKeyDownWithCtrl(const uint32_t& key);
 	void onMousePress(const int& x, const int& y);
 	void onMouseDBClick(const int& x, const int& y);
