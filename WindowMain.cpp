@@ -35,7 +35,6 @@ void WindowMain::onPaint(SkCanvas* canvas)
 
 void WindowMain::onShown()
 {
-    
 }
 
 void WindowMain::onTimer(const uint32_t& key)
@@ -143,6 +142,5 @@ void WindowMain::onMouseDrag(const int& x, const int& y)
 void WindowMain::onMouseRelease(const int& x, const int& y)
 {
     glyphBox.checkCancelSelection();
-
 }
 

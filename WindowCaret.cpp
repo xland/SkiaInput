@@ -19,6 +19,8 @@ void WindowCaret::moveCaret(const int& x, const int& y)
 {
 	SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0,
         SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
+    color = 0xFF000000;
+	onPaint();
 }
 
 void WindowCaret::initWindow()
@@ -37,6 +39,8 @@ void WindowCaret::initWindow()
         clsName, clsName, WS_POPUP, 0, 0, w, h, nullptr, nullptr, hinstance, nullptr);
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
     SetParent(hwnd, win->hwnd);
+    SetForegroundWindow(win->hwnd);
+	SetFocus(win->hwnd);
 }
 
 void WindowCaret::onPaint()

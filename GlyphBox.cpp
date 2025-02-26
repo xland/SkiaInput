@@ -136,6 +136,7 @@ void GlyphBox::moveCaretDown()
     if (caretX >= infos[caretY].wordPos.size()) {
         caretX = infos[caretY].wordPos.size() - 1;
     }
+    refreshCaret();
 }
 
 void GlyphBox::moveCaret(const int& x, const int& y)
