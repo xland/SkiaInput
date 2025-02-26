@@ -18,11 +18,11 @@ WindowCaret::~WindowCaret()
 
 void WindowCaret::moveCaret(const int& x, const int& y)
 {
- //   this->x = x;
- //   this->y = y;
-	//SetWindowPos(hwnd, HWND_TOPMOST, 
- //       100, 100, 0, 0, 
- //       SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
+    this->x = x;
+    this->y = y;
+	SetWindowPos(hwnd, HWND_TOPMOST, 
+        x, y, 0, 0,
+        SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
 }
 
 void WindowCaret::moveWin(const int& x, const int& y)
@@ -47,9 +47,10 @@ void WindowCaret::initWindow()
     wcx.lpszClassName = clsName;
     RegisterClassEx(&wcx);
     hwnd = CreateWindowEx(WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOPMOST,  
-        clsName, clsName, WS_CHILD | WS_VISIBLE, x, y, w, h, win->hwnd, nullptr, hinstance, nullptr);
-    SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA);
+        clsName, clsName, WS_POPUP, x, y, w, h, nullptr, nullptr, hinstance, nullptr);
     SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
+
+    SetParent(hwnd, win->hwnd);
 }
 
 void WindowCaret::onPaint()
@@ -93,7 +94,7 @@ LRESULT WindowCaret::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
         case WM_WINDOWPOSCHANGING: {
             WINDOWPOS* pPos = (WINDOWPOS*)lParam;
             if (!(pPos->flags & SWP_NOZORDER)) {
-                pPos->flags |= SWP_NOZORDER; // 禁止改变 Z 序
+                pPos->flags |= SWP_NOZORDER;
             }
             return 0;
         }

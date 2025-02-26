@@ -45,6 +45,8 @@ OpenGL::~OpenGL()
     surface.reset(nullptr);
     wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(hglrc);
+    grContext.reset(nullptr);
+    backendContext.reset(nullptr);
     hglrc = NULL;
 }
 
@@ -55,7 +57,6 @@ void OpenGL::resize()
         grContext->flushAndSubmit();
     }
 }
-
 sk_sp<SkSurface> OpenGL::getSurface()
 {
     if (nullptr == surface) {
@@ -72,7 +73,6 @@ sk_sp<SkSurface> OpenGL::getSurface()
     }
     return surface;
 }
-
 void OpenGL::init()
 {
     HDC hdc = GetDC(win->hwnd);
@@ -117,11 +117,11 @@ void OpenGL::init()
     fbInfo.fProtected = skgpu::Protected(false);
     grContext = GrDirectContexts::MakeGL(backendContext);
 }
-
 void OpenGL::paint(HDC dc) {
     grContext->flushAndSubmit(surface.get());
     SwapBuffers(dc);
 }
+
 void OpenGL::textureFromImage(sk_sp<SkImage>& image)
 {
     image = SkImages::TextureFromImage(grContext.get(), image.get());

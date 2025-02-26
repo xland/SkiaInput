@@ -9,7 +9,6 @@ class OpenGL:public Backend
 public:
 	OpenGL(WindowBase* win);
 	~OpenGL();
-	static std::unique_ptr<Backend> create(WindowBase* win);
 	void resize() override;
 	sk_sp<SkSurface> getSurface() override;
 	void paint(HDC dc) override;
