@@ -27,9 +27,10 @@ public:
 	void moveCaret(const int& x, const int& y);
 	void checkCancelSelection();
 	void refreshCaret();
+	void onChar(const std::wstring& str);
 public:
 	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 }, colorSelected{ 0X8822FF88 };
-	int caretX{ 0 }, caretY{ 6 };
+	int caretX{ 2 }, caretY{ 0 };
 	int caretXStart{ -1 }, caretYStart{ -1 };
 	int caretXEnd{ -1 }, caretYEnd{ -1 };
 private:

@@ -16,6 +16,7 @@ void GlyphBox::init(WindowMain* win)
     initFont();
     initInfo();
 	caretWin = std::make_shared<WindowCaret>(getLineHeight(), win);
+	win->funcChar.push_back(std::bind(&GlyphBox::onChar, this, std::placeholders::_1));
 }
 void GlyphBox::paintText(SkCanvas* canvas)
 {
@@ -198,6 +199,7 @@ void GlyphBox::initInfo()
     std::wstringstream ss(text);
     std::wstring line;
     int lineIndex{ 0 };
+    infos.clear();
     while (std::getline(ss, line)) {
         GlyphInfo info;
         info.x = padding;
@@ -235,4 +237,38 @@ void GlyphBox::refreshCaret()
     auto lineHeight = getLineHeight();
     auto pos = getInputPos();
     caretWin->moveCaret(pos.fX, pos.fY - lineHeight);
+}
+
+void GlyphBox::onChar(const std::wstring& str)
+{
+    std::wstringstream ss(text);
+    std::wstring line;
+    int lineIndex{ 0 };
+    int charIndex{ 0 };
+    while (std::getline(ss, line)) {
+        if (caretY == lineIndex) {
+			charIndex += caretX;
+            break;
+        }
+        else {
+            charIndex += line.length() + 1;
+            lineIndex += 1;
+        }
+    }
+
+    if (str == L"\r") {
+		text.insert(charIndex, L"\n");
+		caretX = 0;
+		caretY += 1;
+    }
+    else if (str == L"\b")
+    {
+
+    }
+    else {
+        text.insert(charIndex, str);
+        caretX += str.length();
+    }
+    initInfo();
+	InvalidateRect(win->hwnd, nullptr, false);
 }

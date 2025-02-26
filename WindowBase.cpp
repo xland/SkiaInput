@@ -151,6 +151,10 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         onIme();
         return 0;
     }
+    case WM_CHAR: {
+        onChar(std::wstring{ (wchar_t)wParam });
+		return 0;
+    }
     default: {
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
@@ -267,5 +271,13 @@ void WindowBase::onIme()
     for (const auto& func : funcIme)
 	{
         func();
+	}
+}
+
+void WindowBase::onChar(const std::wstring& word)
+{
+	for (const auto& func : funcChar)
+	{
+		func(word);
 	}
 }

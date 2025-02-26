@@ -21,7 +21,6 @@ protected:
 	void onMouseDrag(const int& x, const int& y);
 	void onMouseMove(const int& x, const int& y);
 	void onMousePressRight(const int& x, const int& y);
-	void onTimer(const uint32_t& key);
 	void onIme();
 private:
 	void initPosSize();

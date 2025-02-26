@@ -41,6 +41,7 @@ public:
 	std::vector<std::function<void(const uint32_t&)>> funcKeyDownWithCtrl;
 	std::vector<std::function<void(const uint32_t&)>> funcTimer;
 	std::vector<std::function<void()>> funcIme;
+	std::vector<std::function<void(const std::wstring&)>> funcChar;
 	int x, y, w, h;
 	HWND hwnd;
 protected:
@@ -63,6 +64,7 @@ private:
 	void onKeyDownWithCtrl(const uint32_t& key);
 	void onTimer(const uint32_t& key);
 	void onIme();
+	void onChar(const std::wstring& key);
 private:
 	std::unique_ptr<Backend> backend;
 };
