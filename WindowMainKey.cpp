@@ -76,7 +76,7 @@ void WindowMain::keyBack()
         }
         text.erase(charIndex - 1, 1);
     }
-    refreshCaret();
+    addHistory();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -90,7 +90,7 @@ void WindowMain::keyDel()
         auto charIndex = getCharIndex(caretX, caretY);
         text.erase(charIndex, 1);
     }
-    refreshCaret();
+    addHistory();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -101,7 +101,7 @@ void WindowMain::keyEnter()
     text.insert(charIndex, L"\n");
     caretX = 0;
     caretY += 1;
-    refreshCaret();
+    addHistory();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -112,7 +112,7 @@ void WindowMain::onChar(const std::wstring& str)
     auto charIndex = getCharIndex(caretX, caretY);
     text.insert(charIndex, str);
     caretX += str.length();
-    refreshCaret();
+    addHistory();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -148,10 +148,10 @@ void WindowMain::onKey(const uint32_t& key)
 void WindowMain::onKeyWithCtrl(const uint32_t& key)
 {
     if (key == 'Z') {
-        //undo(); 撤销
+        undo();
     }
     else if (key == 'Y') {
-        //redo(); 重做
+        redo();
     }
     else if (key == 'C') {
         copy();
@@ -196,9 +196,8 @@ void WindowMain::cut()
     text.erase(charIndex0, charIndex1 - charIndex0);
     caretX = caretXStart;
     caretY = caretYStart;
-    caretXStart = -1;  caretYStart = -1;
-    caretXEnd = -1;  caretYEnd = -1;
-    refreshCaret();
+    caretXStart = -1;  caretYStart = -1; caretXEnd = -1;  caretYEnd = -1;
+    addHistory();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -224,9 +223,8 @@ void WindowMain::paste()
         caretY += y;
         caretX = x;
     }
-    caretXStart = -1;  caretYStart = -1;
-    caretXEnd = -1;  caretYEnd = -1;
-    refreshCaret();
+    caretXStart = -1;  caretYStart = -1; caretXEnd = -1;  caretYEnd = -1;
+    addHistory();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -236,5 +234,31 @@ void WindowMain::selectAll()
     caretYStart = 0;
     caretXEnd = infos[infos.size() - 1].wordPos.size() - 1;
     caretYEnd = infos.size() - 1;
+    InvalidateRect(hwnd, nullptr, false);
+}
+
+void WindowMain::undo()
+{
+    if (history.size() <= 1 || historyIndex >= history.size()-1) return;
+    historyIndex += 1;
+    auto& his = history[historyIndex];
+    text = his.text;
+    caretX = his.caretX;
+    caretY = his.caretY;
+    caretXStart = -1;  caretYStart = -1; caretXEnd = -1;  caretYEnd = -1;
+    initInfo();
+    InvalidateRect(hwnd, nullptr, false);
+}
+
+void WindowMain::redo()
+{
+    if (historyIndex <= 0) return;
+    historyIndex -= 1;
+    auto& his = history[historyIndex];
+    text = his.text;
+    caretX = his.caretX;
+    caretY = his.caretY;
+    caretXStart = -1;  caretYStart = -1; caretXEnd = -1;  caretYEnd = -1;
+    initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }

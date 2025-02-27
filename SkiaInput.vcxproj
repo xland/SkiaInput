@@ -159,6 +159,7 @@
     <ClInclude Include="backends\OpenGL.h" />
     <ClInclude Include="backends\Raster.h" />
     <ClInclude Include="GlyphInfo.h" />
+    <ClInclude Include="HistoryInfo.h" />
     <ClInclude Include="WindowBase.h" />
     <ClInclude Include="WindowCaret.h" />
     <ClInclude Include="WindowMain.h" />

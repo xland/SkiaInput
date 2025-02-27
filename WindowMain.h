@@ -2,6 +2,7 @@
 
 #include "WindowBase.h"
 #include "GlyphInfo.h"
+#include "HistoryInfo.h"
 #include "WindowCaret.h"
 
 class WindowMain:public WindowBase
@@ -33,10 +34,7 @@ private:
 	void paintSelectBg(SkCanvas* canvas);
 	void moveCaret(const int& x, const int& y);
 	bool delSelected();
-private:
-	void paintText();
-	void flashCaret();
-	void setCaretPos();
+	void addHistory();
 private: //key
 	void moveCaretLeft();
 	void moveCaretRight();
@@ -49,12 +47,13 @@ private: //key
 	void cut();
 	void paste();
 	void selectAll();
+	void undo();
+	void redo();
 private:
 	uint32_t colorBg{ 0X2222FF88 }, colorFore{ 0XFF000000 }, colorSelected{ 0X8822FF88 };
-	int caretX{ 3 }, caretY{ 1 };
+	int caretX{ 0 }, caretY{ 0 };
 	int caretXStart{ -1 }, caretYStart{ -1 };
 	int caretXEnd{ -1 }, caretYEnd{ -1 };
-
 	SkFont font;
 	std::wstring text{ LR"(破阵子 · 为陈同甫赋壮词以寄之
 辛弃疾 · 宋 · XinQiJi (1140年－1207年) 
@@ -64,6 +63,8 @@ private:
 马作的卢飞快，弓如霹雳弦惊。
 了却君王天下事，赢得生前身后名。可怜白发生！
 )" };
+	std::vector<HistoryInfo> history;
+	int historyIndex{ 0 };
 	bool caretVisible{ true };
 	float padding{ 18 };
 	float fontSize{ 26 };

@@ -5,12 +5,13 @@
 
 WindowMain::WindowMain()
 {
+    addHistory();
     initWinPosSize();
     initWindow();
 	alphaWindow();
     initFont();
-    initInfo();
     caretWin = std::make_shared<WindowCaret>(getLineHeight(), this);
+    initInfo();
 	funcPaint.push_back(std::bind(&WindowMain::onPaint, this, std::placeholders::_1));
 	funcShown.push_back(std::bind(&WindowMain::onShown, this));
 	funcMousePress.push_back(std::bind(&WindowMain::onMousePress, this, std::placeholders::_1, std::placeholders::_2));
@@ -35,7 +36,6 @@ void WindowMain::onPaint(SkCanvas* canvas)
 
 void WindowMain::onShown()
 {
-    refreshCaret();
 }
 
 void WindowMain::initWinPosSize()
@@ -116,6 +116,8 @@ void WindowMain::initInfo()
         lineIndex += 1;
         infos.push_back(info);
     }
+    auto pos = getCaretPos(caretX, caretY);
+    caretWin->move(pos.fX, pos.fY - height);
 }
 float WindowMain::getLineHeight()
 {
@@ -251,4 +253,13 @@ bool WindowMain::delSelected()
         return true;
     }
     return false;
+}
+
+void WindowMain::addHistory()
+{
+    if (historyIndex > 0) {
+        history.erase(history.begin(), history.begin() + historyIndex+1);
+        historyIndex = 0;
+    }
+    history.insert(history.begin(), { text,caretX,caretY });
 }
