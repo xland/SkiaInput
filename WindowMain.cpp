@@ -35,6 +35,7 @@ void WindowMain::onPaint(SkCanvas* canvas)
 
 void WindowMain::onShown()
 {
+    refreshCaret();
 }
 
 void WindowMain::initWinPosSize()
@@ -160,7 +161,6 @@ void WindowMain::paintText(SkCanvas* canvas)
     {
         canvas->drawGlyphs(info.wordPos.size() - 1, info.glyphs.data(), info.wordPos.data(), SkPoint(info.x, info.y), font, paint);
     }
-    refreshCaret();
 }
 void WindowMain::paintSelectBg(SkCanvas* canvas)
 {
@@ -234,4 +234,21 @@ void WindowMain::moveCaret(const int& x, const int& y)
         caretX = infos[caretY].wordPos.size() - 1;
     }
     refreshCaret();
+}
+
+bool WindowMain::delSelected()
+{
+    auto flag1 = (caretXStart == -1 || caretYStart == -1 || caretXEnd == -1 || caretYEnd == -1);
+    auto flag2 = (caretXStart == caretXEnd && caretYStart == caretYEnd);
+    if (!flag1 && !flag2) {
+        auto charIndex0 = getCharIndex(caretXStart, caretYStart);
+        auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
+        text.erase(charIndex0, charIndex1 - charIndex0);
+        caretX = caretXStart;
+        caretY = caretYStart;
+        caretXStart = -1;  caretYStart = -1;
+        caretXEnd = -1;  caretYEnd = -1;
+        return true;
+    }
+    return false;
 }

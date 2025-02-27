@@ -32,6 +32,7 @@ private:
 	void paintText(SkCanvas* canvas);
 	void paintSelectBg(SkCanvas* canvas);
 	void moveCaret(const int& x, const int& y);
+	bool delSelected();
 private:
 	void paintText();
 	void flashCaret();

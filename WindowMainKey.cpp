@@ -59,48 +59,60 @@ void WindowMain::moveCaretDown()
 }
 void WindowMain::keyBack()
 {
-    if (caretX == 0 && caretY == 0) return;
-    auto charIndex = getCharIndex(caretX, caretY);
-    caretX -= 1;
-    if (caretX < 0) {
-        caretY -= 1;
-        if (caretY < 0) {
-            caretX = 0;
-            caretY = 0;
+    if (!delSelected())
+    {
+        if (caretX == 0 && caretY == 0) return;
+        auto charIndex = getCharIndex(caretX, caretY);
+        caretX -= 1;
+        if (caretX < 0) {
+            caretY -= 1;
+            if (caretY < 0) {
+                caretX = 0;
+                caretY = 0;
+            }
+            else {
+                caretX = infos[caretY].wordPos.size() - 1;
+            }
         }
-        else {
-            caretX = infos[caretY].wordPos.size() - 1;
-        }
+        text.erase(charIndex - 1, 1);
     }
-    text.erase(charIndex - 1, 1);
-    initInfo();
-    InvalidateRect(hwnd, nullptr, false);
-}
-void WindowMain::keyEnter()
-{
-    auto charIndex = getCharIndex(caretX, caretY);
-    text.insert(charIndex, L"\n");
-    caretX = 0;
-    caretY += 1;
+    refreshCaret();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
 void WindowMain::keyDel()
 {
-    if (caretX == infos[caretY].wordPos.size() - 1 && caretY == infos.size() - 1) {
-        return;
+    if (!delSelected())
+    {
+        if (caretX == infos[caretY].wordPos.size() - 1 && caretY == infos.size() - 1) {
+            return;
+        }
+        auto charIndex = getCharIndex(caretX, caretY);
+        text.erase(charIndex, 1);
     }
+    refreshCaret();
+    initInfo();
+    InvalidateRect(hwnd, nullptr, false);
+}
+void WindowMain::keyEnter()
+{
+    delSelected();
     auto charIndex = getCharIndex(caretX, caretY);
-    text.erase(charIndex, 1);
+    text.insert(charIndex, L"\n");
+    caretX = 0;
+    caretY += 1;
+    refreshCaret();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
 
 void WindowMain::onChar(const std::wstring& str)
 {
+    delSelected();
     auto charIndex = getCharIndex(caretX, caretY);
     text.insert(charIndex, str);
     caretX += str.length();
+    refreshCaret();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -186,6 +198,7 @@ void WindowMain::cut()
     caretY = caretYStart;
     caretXStart = -1;  caretYStart = -1;
     caretXEnd = -1;  caretYEnd = -1;
+    refreshCaret();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -201,20 +214,9 @@ void WindowMain::paste()
         y += 1;
         x = str.size() - 1 - pos;
     }
-    auto flag1 = (caretXStart == -1 || caretYStart == -1 || caretXEnd == -1 || caretYEnd == -1);
-    auto flag2 = (caretXStart == caretXEnd && caretYStart == caretYEnd);
-    if (flag1 || flag2) {
-        auto charIndex = getCharIndex(caretX, caretY);
-        text.insert(charIndex, str);
-    }
-    else {
-        auto charIndex0 = getCharIndex(caretXStart, caretYStart);
-        auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
-        text.erase(charIndex0, charIndex1 - charIndex0);
-        caretX = caretXStart;
-        caretY = caretYStart;
-        text.insert(charIndex0, str);
-    }
+    delSelected();
+    auto charIndex = getCharIndex(caretX, caretY);
+    text.insert(charIndex, str);
     if (y == 0) {
         caretX += x;
     }
@@ -224,6 +226,7 @@ void WindowMain::paste()
     }
     caretXStart = -1;  caretYStart = -1;
     caretXEnd = -1;  caretYEnd = -1;
+    refreshCaret();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }

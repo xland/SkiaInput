@@ -62,9 +62,6 @@
     <ClInclude Include="GlyphInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="PaintState.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="WindowCaret.h">
       <Filter>头文件</Filter>
     </ClInclude>
