@@ -258,7 +258,7 @@ bool WindowMain::delSelected()
 void WindowMain::addHistory()
 {
     if (historyIndex > 0) {
-        history.erase(history.begin(), history.begin() + historyIndex+1);
+        history.erase(history.begin(), history.begin() + historyIndex);
         historyIndex = 0;
     }
     history.insert(history.begin(), { text,caretX,caretY });
