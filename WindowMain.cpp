@@ -191,11 +191,10 @@ bool WindowMain::delSelected()
     auto flag1 = (caretXStart == -1 || caretYStart == -1 || caretXEnd == -1 || caretYEnd == -1);
     auto flag2 = (caretXStart == caretXEnd && caretYStart == caretYEnd);
     if (!flag1 && !flag2) {
-        auto charIndex0 = getCharIndex(caretXStart, caretYStart);
-        auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
+        auto [charIndex0, charIndex1] = getSelectionCharIndex();
         text.erase(charIndex0, charIndex1 - charIndex0);
-        caretX = caretXStart;
-        caretY = caretYStart;
+        caretX = std::min(caretXStart,caretXEnd);
+        caretY = std::min(caretYStart,caretXEnd);
         caretXStart = -1;  caretYStart = -1;
         caretXEnd = -1;  caretYEnd = -1;
         return true;

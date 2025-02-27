@@ -191,13 +191,13 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         onSize(w,h);
         return 0;
     }
-    case WM_SETCURSOR: {
-        POINT pt;
-        GetCursorPos(&pt);        
-        ScreenToClient(hwnd, &pt);
-        onSetCursor(pt.x, pt.y);
-        return TRUE;
-    }
+    //case WM_SETCURSOR: {
+    //    POINT pt;
+    //    GetCursorPos(&pt);        
+    //    ScreenToClient(hwnd, &pt);
+    //    onSetCursor(pt.x, pt.y);
+    //    return TRUE;
+    //}
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
