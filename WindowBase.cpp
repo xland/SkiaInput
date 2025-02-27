@@ -37,6 +37,99 @@ void WindowBase::show()
     UpdateWindow(hwnd);
     onShown();
 }
+
+bool WindowBase::alphaWindow()
+{
+    if (!IsWindowsVistaOrGreater()) { return false; }
+    BOOL isCompositionEnable = false;
+    //检查DWM是否启用
+    DwmIsCompositionEnabled(&isCompositionEnable);
+    if (!isCompositionEnable) { return true; }
+    DWORD currentColor = 0;
+    BOOL isOpaque = false;
+    //检查是否支持毛玻璃效果
+    DwmGetColorizationColor(&currentColor, &isOpaque);
+    if (!isOpaque || IsWindows8OrGreater())
+    {
+        HRGN region = CreateRectRgn(0, 0, -1, -1);
+        DWM_BLURBEHIND bb = { 0 };
+        bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
+        bb.hRgnBlur = region;
+        bb.fEnable = TRUE;
+        DwmEnableBlurBehindWindow(hwnd, &bb);
+        DeleteObject(region);
+        return true;
+    }
+    else // For Window7
+    {
+        DWM_BLURBEHIND bb = { 0 };
+        bb.dwFlags = DWM_BB_ENABLE;
+        DwmEnableBlurBehindWindow(hwnd, &bb);
+        return false;
+    }
+}
+bool WindowBase::setClipboard(const std::wstring& text)
+{
+    if (!OpenClipboard(nullptr))
+    {
+        return false;
+    }
+    EmptyClipboard();
+    size_t size = (text.length() + 1) * sizeof(wchar_t);
+    HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, size);
+    if (hGlobal == nullptr)
+    {
+        CloseClipboard();
+        return false;
+    }
+    wchar_t* pData = static_cast<wchar_t*>(GlobalLock(hGlobal));
+    if (pData == nullptr)
+    {
+        GlobalFree(hGlobal);
+        CloseClipboard();
+        return false;
+    }
+    wcscpy_s(pData, text.length() + 1, text.c_str());
+    GlobalUnlock(hGlobal);
+    if (SetClipboardData(CF_UNICODETEXT, hGlobal) == nullptr)
+    {
+        GlobalFree(hGlobal);
+        CloseClipboard();
+        return false;
+    }
+    CloseClipboard();
+    return true;
+}
+
+std::wstring WindowBase::getClipboard()
+{
+    if (!OpenClipboard(nullptr))
+    {
+        return L"";
+    }
+    if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
+    {
+        CloseClipboard();
+        return L"";
+    }
+    HGLOBAL hGlobal = GetClipboardData(CF_UNICODETEXT);
+    if (hGlobal == nullptr)
+    {
+        CloseClipboard();
+        return L"";
+    }
+	auto pData = static_cast<wchar_t*>(GlobalLock(hGlobal));
+	if (pData == nullptr)
+	{
+		CloseClipboard();
+		return L"";
+	}
+    std::wstring result{ pData };
+    GlobalUnlock(hGlobal);
+    CloseClipboard();
+    return result;
+}
+
 LRESULT WindowBase::routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     auto obj = reinterpret_cast<WindowBase*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));

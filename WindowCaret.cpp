@@ -1,6 +1,5 @@
 ﻿#include <memory>
 #include "WindowCaret.h"
-#include "Util.h"
 #include "WindowMain.h"
 
 
@@ -15,10 +14,9 @@ WindowCaret::~WindowCaret()
 {
 }
 
-void WindowCaret::moveCaret(const int& x, const int& y)
+void WindowCaret::move(const int& x, const int& y)
 {
-	SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0,
-        SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
+	SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE| SWP_NOZORDER| SWP_SHOWWINDOW);
     color = 0xFF000000;
 	onPaint();
 }

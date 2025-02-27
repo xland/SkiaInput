@@ -147,26 +147,19 @@
     <ClCompile Include="backends\Backend.cpp" />
     <ClCompile Include="backends\OpenGL.cpp" />
     <ClCompile Include="backends\Raster.cpp" />
-    <ClCompile Include="GlyphBox.cpp" />
-    <ClCompile Include="GlyphInfo.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Util.cpp" />
     <ClCompile Include="WindowBase.cpp" />
     <ClCompile Include="WindowCaret.cpp" />
     <ClCompile Include="WindowMain.cpp" />
     <ClCompile Include="WindowMainKey.cpp" />
     <ClCompile Include="WindowMainMouse.cpp" />
-    <ClCompile Include="WindowMainPaint.cpp" />
-    <ClCompile Include="WindowMainUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\Backend.h" />
     <ClInclude Include="backends\OpenGL.h" />
     <ClInclude Include="backends\Raster.h" />
-    <ClInclude Include="GlyphBox.h" />
     <ClInclude Include="GlyphInfo.h" />
     <ClInclude Include="PaintState.h" />
-    <ClInclude Include="Util.h" />
     <ClInclude Include="WindowBase.h" />
     <ClInclude Include="WindowCaret.h" />
     <ClInclude Include="WindowMain.h" />

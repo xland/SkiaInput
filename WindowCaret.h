@@ -10,8 +10,7 @@ class WindowCaret
 public:
 	WindowCaret(const int& height, WindowMain* win);
 	~WindowCaret();
-	void moveCaret(const int&x,const int& y);
-	void moveWin(const int& x, const int& y);
+	void move(const int&x,const int& y);
 public:
 	int  w{ 1 }, h{0};
 	HWND hwnd;

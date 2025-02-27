@@ -15,8 +15,10 @@
 #include <include/core/SkFontStyle.h>
 #include <include/ports/SkTypeface_win.h>
 #include <include/core/SkFontMetrics.h>
+#include <dwmapi.h>
+#include <versionhelpers.h>
+#include <windowsx.h>
 
-#include "Util.h"
 #include "backends/Backend.h"
 
 
@@ -46,7 +48,9 @@ public:
 	HWND hwnd;
 protected:
 	void initWindow();
-
+	bool alphaWindow();
+	bool setClipboard(const std::wstring& text);
+	std::wstring getClipboard();
 private:
 	static LRESULT CALLBACK routeWinMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam);
