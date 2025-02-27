@@ -191,6 +191,13 @@ LRESULT WindowBase::processWinMsg(UINT msg, WPARAM wParam, LPARAM lParam)
         onSize(w,h);
         return 0;
     }
+    case WM_SETCURSOR: {
+        POINT pt;
+        GetCursorPos(&pt);        
+        ScreenToClient(hwnd, &pt);
+        onSetCursor(pt.x, pt.y);
+        return TRUE;
+    }
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hwnd, &ps);
@@ -375,4 +382,12 @@ void WindowBase::onChar(const std::wstring& word)
 	{
 		func(word);
 	}
+}
+
+void WindowBase::onSetCursor(const int& x, const int& y)
+{
+    for (const auto& func : funcSetCursor)
+    {
+        func(x,y);
+    }
 }

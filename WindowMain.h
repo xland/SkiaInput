@@ -32,6 +32,7 @@ private:
 	void refreshCaret();
 	void paintText(SkCanvas* canvas);
 	void paintSelectBg(SkCanvas* canvas);
+	void paintScroller(SkCanvas* canvas);
 	void moveCaret(const int& x, const int& y);
 	bool delSelected();
 	void addHistory();

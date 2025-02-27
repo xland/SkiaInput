@@ -42,6 +42,7 @@ public:
 	std::vector<std::function<void(const uint32_t&)>> funcKeyDown;
 	std::vector<std::function<void(const uint32_t&)>> funcKeyDownWithCtrl;
 	std::vector<std::function<void(const uint32_t&)>> funcTimer;
+	std::vector<std::function<void(const int&, const int&)>> funcSetCursor;
 	std::vector<std::function<void()>> funcIme;
 	std::vector<std::function<void(const std::wstring&)>> funcChar;
 	int x, y, w, h;
@@ -69,6 +70,7 @@ private:
 	void onTimer(const uint32_t& key);
 	void onIme();
 	void onChar(const std::wstring& key);
+	void onSetCursor(const int& x, const int& y);
 private:
 	std::unique_ptr<Backend> backend;
 };

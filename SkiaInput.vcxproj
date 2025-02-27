@@ -153,6 +153,7 @@
     <ClCompile Include="WindowMain.cpp" />
     <ClCompile Include="WindowMainKey.cpp" />
     <ClCompile Include="WindowMainMouse.cpp" />
+    <ClCompile Include="WindowMainPaint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backends\Backend.h" />
