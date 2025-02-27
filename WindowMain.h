@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include <sstream>
 #include "WindowBase.h"
 #include "GlyphInfo.h"
 #include "HistoryInfo.h"
@@ -35,6 +35,7 @@ private:
 	void moveCaret(const int& x, const int& y);
 	bool delSelected();
 	void addHistory();
+	std::pair<int, int> getSelectionCharIndex();
 private: //key
 	void moveCaretLeft();
 	void moveCaretRight();

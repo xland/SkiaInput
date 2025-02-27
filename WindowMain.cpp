@@ -1,5 +1,4 @@
-﻿#include <sstream>
-#include "WindowMain.h"
+﻿#include "WindowMain.h"
 #include "WindowCaret.h"
 
 
@@ -147,6 +146,7 @@ int WindowMain::getCharIndex(const int& caretX, const int& caretY)
     }
     return charIndex;
 }
+
 SkPoint WindowMain::getCaretPos(const int& caretX, const int& caretY)
 {
     auto x = infos[caretY].wordPos[caretX].fX + infos[caretY].x;
@@ -262,4 +262,12 @@ void WindowMain::addHistory()
         historyIndex = 0;
     }
     history.insert(history.begin(), { text,caretX,caretY });
+}
+
+std::pair<int, int> WindowMain::getSelectionCharIndex()
+{
+    auto charIndex0 = getCharIndex(caretXStart, caretYStart);
+    auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
+    if (charIndex0 > charIndex1) std::swap(charIndex0, charIndex1);
+    return { charIndex0,charIndex1 };
 }

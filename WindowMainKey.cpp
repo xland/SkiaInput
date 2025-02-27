@@ -175,8 +175,7 @@ void WindowMain::copy()
     if (caretXStart == caretXEnd && caretYStart == caretYEnd) {
         return;
     }
-    auto charIndex0 = getCharIndex(caretXStart, caretYStart);
-    auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
+    auto [charIndex0, charIndex1] = getSelectionCharIndex();
     auto str = text.substr(charIndex0, charIndex1 - charIndex0);
     setClipboard(str);
 }
@@ -189,8 +188,7 @@ void WindowMain::cut()
     if (caretXStart == caretXEnd && caretYStart == caretYEnd) {
         return;
     }
-    auto charIndex0 = getCharIndex(caretXStart, caretYStart);
-    auto charIndex1 = getCharIndex(caretXEnd, caretYEnd);
+    auto [charIndex0, charIndex1] = getSelectionCharIndex();
     auto str = text.substr(charIndex0, charIndex1 - charIndex0);
     setClipboard(str);
     text.erase(charIndex0, charIndex1 - charIndex0);
@@ -206,12 +204,16 @@ void WindowMain::paste()
 {
     auto str = getClipboard();
     if (str.empty()) return;
-    size_t x{ str.size() }, y{ 0 }, pos{ 0 };
-    while ((pos = str.find(L"\r\n")) != std::wstring::npos)
+    str.erase(std::remove(str.begin(), str.end(), L'\r'), str.end());
+    int x{0}, y{-1};
     {
-        str.replace(pos, 2, L"\n");
-        y += 1;
-        x = str.size() - 1 - pos;
+        std::wstringstream ss(str);
+        std::wstring line;
+        while (std::getline(ss, line))
+        {
+            ++y;
+        }
+        x += line.size();
     }
     delSelected();
     auto charIndex = getCharIndex(caretX, caretY);
