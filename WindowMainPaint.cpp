@@ -55,13 +55,12 @@ void WindowMain::paintSelectBg(SkCanvas* canvas)
 
 void WindowMain::paintScroller(SkCanvas* canvas)
 {
-    auto width{ 16 };
-    auto rect = SkRect::MakeLTRB(w- width, 0, w, h);
-    SkPaint paint;
-    paint.setColor(0x66888888);
-    canvas->drawRect(rect, paint);
-
-    rect = SkRect::MakeXYWH(w - width, 0, w, 200);
-    paint.setColor(0x66828228);
-    canvas->drawRect(rect, paint);
+    //auto width{ 16 };
+    //auto rect = SkRect::MakeLTRB(w- width, 0, w, h);
+    //SkPaint paint;
+    //paint.setColor(0x66888888);
+    //canvas->drawRect(rect, paint);
+    //rect = SkRect::MakeXYWH(w - width, 0, w, 200);
+    //paint.setColor(0x66828228);
+    //canvas->drawRect(rect, paint);
 }

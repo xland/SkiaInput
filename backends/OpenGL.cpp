@@ -94,8 +94,7 @@ void OpenGL::init()
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
         WGL_CONTEXT_PROFILE_MASK_ARB,
-        WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        0
+        WGL_CONTEXT_CORE_PROFILE_BIT_ARB,0
     };
     HGLRC hglrc;
     HGLRC newContext = wglCreateContextAttribsARB(hdc, 0, attribs);
