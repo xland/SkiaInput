@@ -112,7 +112,6 @@ void WindowMain::onChar(const std::wstring& str)
     auto charIndex = getCharIndex(caretX, caretY);
     text.insert(charIndex, str);
     caretX += str.length();
-    addHistory();
     initInfo();
     InvalidateRect(hwnd, nullptr, false);
 }
@@ -148,6 +147,9 @@ void WindowMain::onKey(const uint32_t& key)
 void WindowMain::onKeyWithCtrl(const uint32_t& key)
 {
     if (key == 'Z') {
+        if (text != history[historyIndex].text) {
+            addHistory();
+        }
         undo();
     }
     else if (key == 'Y') {
